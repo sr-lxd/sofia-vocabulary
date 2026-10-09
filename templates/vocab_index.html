@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="format-detection" content="telephone=no,email=no,address=no" />
+  <title>Sofia背单词 - 学习界面</title>
+  <link rel="icon" href="/custom-icon?icon=s2" />
+  
+  <!-- 资源预加载优化 -->
+  <link rel="prefetch" href="/vocab/vocab-static/vendor/adv-app.iife.js" as="script" crossorigin="anonymous">
+  <link rel="prefetch" href="/vocab/vocab-static/vendor/react.production.min.js" as="script" crossorigin="anonymous">
+  <link rel="prefetch" href="/vocab/vocab-static/vendor/react-dom.production.min.js" as="script" crossorigin="anonymous">
+  <link rel="dns-prefetch" href="//api.deepseek.com">
+  <link rel="dns-prefetch" href="//localhost">
+  
+  <!-- 提供给动态脚本用的 CSP nonce（后端需注入 g.csp_nonce 或自行替换） -->
+  <meta name="csp-nonce" content="{{ g.csp_nonce }}">
+  <style>
+    :root{
+      --card:#fff; --bg:#f7fafc; --muted:#6b7280; --ring:rgba(99,102,241,.18);
+      --safe-bottom: env(safe-area-inset-bottom);
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0; background:var(--bg);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans",sans-serif;
+      overflow-x:hidden;
+      scrollbar-gutter: stable both-edges;
+    }
+    .wrap{max-width:980px;margin:0 auto;padding:18px;min-height:100svh;}
+    .card{background:var(--card);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.06);padding:18px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .muted{color:var(--muted)}
+    .btn{padding:10px 14px;border-radius:12px;border:1px solid #e5e7eb;background:#fff;cursor:pointer;transition:.15s;touch-action:manipulation}
+    .btn:hover{box-shadow:0 0 0 4px var(--ring)}
+    .link{color:#2563eb;border:none;padding:6px 8px}
+    .link:hover{text-decoration:underline;box-shadow:none}
+    .badge{display:inline-block;padding:2px 8px;border-radius:999px;background:#eef2ff;color:#3730a3;font-size:12px;margin-right:6px}
+
+    /* Sofia背单词容器 */
+    #advanced-root .card{padding:0;border-radius:16px;overflow:hidden}
+    #adv-mount{
+      padding:12px;
+      /* 🚀 补丁3：容器级"跳过布局与绘制"优化 */
+      content-visibility: auto;
+      contain-intrinsic-size: 800px 600px; /* 给个合理的占位尺寸，避免 CLS */
+    }
+
+    @media (max-width: 640px){
+      .wrap{padding:12px}
+      body{padding-bottom:90px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- 仅保留：Sofia背单词容器 -->
+    <div id="advanced-root">
+      <div class="card" id="adv-mount">
+        <!-- 优化的加载状态 -->
+        <div id="loading-screen" style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-height: 400px;
+          padding: 40px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border-radius: 16px;
+          text-align: center;
+        ">
+          <div style="
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+          "></div>
+          <h2 style="margin: 0 0 10px 0; font-size: 24px; font-weight: bold;">
+            📚 Sofia背单词
+          </h2>
+          <p style="margin: 0 0 20px 0; font-size: 16px; opacity: 0.9;" id="loading-text">
+            正在加载应用组件...
+          </p>
+          <div style="
+            width: 200px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 10px;
+          ">
+            <div id="progress-bar" style="
+              width: 0%;
+              height: 100%;
+              background: rgba(255,255,255,0.8);
+              border-radius: 2px;
+              transition: width 0.3s ease;
+            "></div>
+          </div>
+          <small style="opacity: 0.7; font-size: 12px;">
+            首次加载可能需要几秒钟，请稍候...
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+  </div>
+  <footer style="margin-top:32px;padding:18px 0 12px 0;text-align:center;font-size:13px;color:#6b7280;">
+    © 2024. 枫中教育数字化转型研发组. 沪ICP备2024093123号. 内部使用.
+  </footer>
+
+  <script>
+    // -------------------- 基本配置 --------------------
+    const API_BASE   = "/vocab/api";
+    const vendorBases = [
+      "/vocab/vocab-static/vendor"
+    ];
+
+    // 供 iife 挂载用的配置（与 adv.jsx 对齐）
+    window.__VOCAB_CONFIG__ = { apiBase: API_BASE, autoSpeakDefault: false };
+
+    // -------------------- CSP 友好的优化动态脚本加载 --------------------
+    function getCspNonce(){
+      const m = document.querySelector('meta[name="csp-nonce"]');
+      return m ? (m.getAttribute('content') || '') : '';
+    }
+    
+    // 脚本加载缓存优化
+    const scriptCache = new Map();
+    
+    function loadScript(src, priority = 'high'){
+      if (scriptCache.has(src)) {
+        return scriptCache.get(src);
+      }
+      
+      const promise = new Promise((res,rej)=>{
+        const s = document.createElement('script');
+        s.src = src;
+        s.async = true;
+        s.crossOrigin = "anonymous";
+        
+        if ('fetchPriority' in s) {
+          s.fetchPriority = priority;
+        }
+        
+        const nonce = getCspNonce();
+        if (nonce) s.setAttribute('nonce', nonce);
+        
+        s.onload = ()=>{ res(true); };
+        s.onerror = (e)=>{
+          console.warn(`❌ Script failed: ${src}`, e);
+          scriptCache.delete(src);
+          rej(new Error('load fail: '+src));
+        };
+        
+        document.head.appendChild(s);
+      });
+      
+      scriptCache.set(src, promise);
+      return promise;
+    }
+
+    // -------------------- 简化的 adv-app.iife.js 加载 --------------------
+    async function loadAdvIIFE(){
+      const ver = Date.now();
+      const src = `/vocab/vocab-static/vendor/adv-app.iife.js?v=${ver}`;
+      
+      try {
+        await loadScript(src, 'high');
+        return true;
+      } catch (error) {
+        console.error(`❌ adv-app.iife.js 加载失败:`, error);
+        throw new Error(`无法加载 adv-app.iife.js: ${error.message}`);
+      }
+    }
+
+    // -------------------- 挂载高级版（优化版） --------------------
+    async function mountAdvanced(){
+      const loadingText = document.getElementById('loading-text');
+      const progressBar = document.getElementById('progress-bar');
+      const loadingScreen = document.getElementById('loading-screen');
+      
+      function updateProgress(percent, text) {
+        if (progressBar) progressBar.style.width = percent + '%';
+        if (loadingText) loadingText.textContent = text;
+      }
+      
+      const timeoutId = setTimeout(() => {
+        updateProgress(0, '初始化超时，正在重试...');
+        setTimeout(() => {
+          location.reload();
+        }, 3000);
+      }, 15000);
+      
+      try {
+        updateProgress(20, '正在加载核心组件...');
+        
+        await loadAdvIIFE();
+        updateProgress(60, '正在初始化应用...');
+        
+        const adv = window.AdvVocab;
+        const mountEl = document.getElementById('adv-mount');
+        
+        if (!adv || typeof adv.mountAdvanced !== 'function') {
+          throw new Error('未找到 AdvVocab.mountAdvanced');
+        }
+        
+        updateProgress(80, '正在挂载界面...');
+        
+        clearTimeout(timeoutId);
+        
+        if (loadingScreen) {
+          loadingScreen.style.display = 'none';
+        }
+        
+        updateProgress(100, '加载完成！');
+        
+        adv.mountAdvanced({ el: mountEl, apiBase: API_BASE });
+        
+      } catch(err) {
+        clearTimeout(timeoutId);
+        updateProgress(0, '加载失败：' + (err?.message || err));
+        
+        const errorHtml = `
+          <div style="
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px;
+          ">
+            <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+            <h3 style="margin: 0 0 10px 0; color: #991b1b;">加载失败</h3>
+            <p style="margin: 0 0 15px 0; color: #7f1d1d;">
+              ${err?.message || err}
+            </p>
+            <div style="margin: 10px 0;">
+              <button onclick="location.reload()" style="
+                padding: 10px 20px;
+                background: #dc2626;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+                margin-right: 10px;
+              ">
+                🔄 重新加载
+              </button>
+              <button onclick="window.location.href='/vocab/signin'" style="
+                padding: 10px 20px;
+                background: #6b7280;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 14px;
+              ">
+                🔙 返回登录
+              </button>
+            </div>
+          </div>
+        `;
+        
+        if (loadingScreen) {
+          loadingScreen.innerHTML = errorHtml;
+        } else {
+          document.getElementById('adv-mount').innerHTML = errorHtml;
+        }
+        
+        console.error('High-level mount error:', err);
+      }
+    }
+
+    // 启动应用
+    mountAdvanced();
+  </script>  
+</body>
+</html>

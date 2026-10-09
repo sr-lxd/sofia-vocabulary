@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local app data and secrets
+vocab.db
+*.sqlite
+*.sqlite3
+.env
+.env.*
+!.env.example
+
+# Logs and editor files
+*.log
+.vscode/
+.idea/
+
+# Old snapshots and private notes
+routes_*.py
+sofia_user.*
+
+# Frontend development copies and build caches
+static/vendor/vocab_pro/
+static/vendor/tree.py
+static/vendor/vendor.cmd
+static/vendor/新建 文本文档.txt

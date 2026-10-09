@@ -1,0 +1,1452 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>Sofia背单词使用帮助</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      color-scheme: light dark;
+      --fg:#1f2937; --muted:#6b7280; --link:#2563eb; --bg:#ffffff; --hr:#e5e7eb;
+      --card:#f9fafb; --kbd:#111827; --kbdfg:#f9fafb;
+      --btnbg:#111827; --btnfg:#f9fafb;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --fg:#e5e7eb; --muted:#9ca3af; --link:#93c5fd; --bg:#0b1020; --hr:#1f2937;
+        --card:#12172a; --kbd:#f9fafb; --kbdfg:#111827;
+        --btnbg:#f9fafb; --btnfg:#111827;
+      }
+    }
+    body{margin:0 auto;max-width:960px;padding:24px 16px;font:16px/1.7 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--fg);}
+    h1,h2,h3{line-height:1.3}
+    h1{font-size:28px;margin:0 0 12px}
+    h2{font-size:22px;margin:28px 0 8px}
+    h3{font-size:18px;margin:18px 0 8px}
+    p,ul,ol{margin:8px 0 12px}
+    code,kbd,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New","Noto Sans Mono CJK SC",monospace}
+    code{background:rgba(148,163,184,.15);padding:.1em .35em;border-radius:.3em}
+    kbd{background:var(--kbd); color:var(--kbdfg); padding:.15em .45em;border-radius:.35em; font-size:13px}
+    pre{background:var(--card);padding:12px;border-radius:12px;overflow:auto;border:1px solid var(--hr)}
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .muted{color:var(--muted)}
+    .card{background:var(--card);border:1px solid var(--hr);border-radius:12px;padding:12px 14px;margin:10px 0}
+    hr{border:none;border-top:1px solid var(--hr);margin:20px 0}
+    .toc li{margin:6px 0}
+    .tip{border-left:4px solid #22c55e;padding-left:10px}
+    .warn{border-left:4px solid #f59e0b;padding-left:10px}
+    .danger{border-left:4px solid #ef4444;padding-left:10px}
+    .tag{display:inline-block;padding:.1em .5em;border-radius:999px;background:#e5e7eb;color:#111827;font-size:12px;margin-left:.5em}
+    @media (prefers-color-scheme: dark){ .tag{background:#374151;color:#e5e7eb}}
+
+    .topnav{display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:8px 14px;border:1px solid var(--hr);background:var(--btnbg);color:var(--btnfg);text-decoration:none;line-height:1}
+    .btn:hover{text-decoration:none;opacity:.9}
+    .btn-outline{background:transparent;color:var(--fg)}
+
+    /* 新增样式：表格样式 */
+    table{width:100%; border-collapse:collapse; margin:15px 0;}
+    th, td{border:1px solid var(--hr); padding:8px 12px; text-align:left;}
+    th{background:var(--card); font-weight:bold;}
+    
+    /* 新增样式：代码高亮 */
+    .highlight{background:rgba(255,235,59,0.3); padding:2px 4px; border-radius:3px;}
+    
+    /* 新增样式：功能卡片 */
+    .feature-card{background:var(--card); border:1px solid var(--hr); border-radius:8px; padding:16px; margin:12px 0;}
+    .feature-card h4{margin:0 0 8px 0; color:#2563eb;}
+    
+    /* 新增样式：版本标签 */
+    .version{background:#22c55e; color:white; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:bold;}
+    .version.new{background:#ef4444;}
+    
+    /* 新增样式：分页相关 */
+    .pagination-info{background:#f0f9ff; border:1px solid #0ea5e9; border-radius:6px; padding:8px 12px; margin:8px 0; color:#0c4a6e;}
+    
+    /* 新增样式：API代码块增强 */
+    .api-endpoint{background:#1e293b; color:#e2e8f0; padding:2px 6px; border-radius:4px; font-size:13px; font-family:monospace;}
+    
+    /* 新增样式：统计数字高亮 */
+    .stat-number{background:#dbeafe; color:#1e40af; padding:1px 4px; border-radius:3px; font-weight:bold;}
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="topnav" aria-label="顶部导航">
+      <a id="nav-home" class="btn btn-outline" href="#">回首页</a>
+      <a id="nav-app" class="btn" href="#">打开应用</a>
+    </nav>
+
+    <h1>Sofia背单词使用帮助 <span class="version new">v2.2.5</span></h1>
+    <p class="muted">功能说明与操作指南</p>
+    <p class="muted">最后更新：2025-10-05（v2.2.5新版本：移动端中文释义容器最大化显示优化，缓存同步机制全面改进，性能优化与响应式布局增强）</p>
+    <div class="card">
+      <strong>这是一份"前后端一致性"的完整使用说明</strong>：涵盖最新的四按钮评分系统、智能语音朗读、时间分布优化、批量预取机制、搜索插队与学习起点、Markdown 渲染、导入/导出功能、点击统计排行榜分页、完整的排行榜数据导入恢复功能、移动端界面优化、以及完整的API接口文档。v2.2.5版本重点优化：移动端中文释义容器最大化显示（负边距技术扩展宽度）、缓存同步机制全面改进、性能优化与响应式布局增强。
+    </div>
+  </header>
+
+
+  <!-- ================= 一、快速入门 ================= -->
+  <section id="getting-started">
+    <h1>一、快速入门</h1>
+    
+    <section id="quickstart">
+      <h2>1.1 快速上手</h2>
+      <div class="feature-card">
+        <h4>🚀 三步开始学习</h4>
+        <ol>
+          <li><strong>注册账号</strong>：使用 <code>demo / demo</code> 体验或创建新账号</li>
+          <li><strong>导入词库</strong>：点击"载入词库"上传JSON格式词汇表，或使用系统默认词库</li>
+          <li><strong>开始学习</strong>：点击"下一张"开始，使用四个评分按钮进行学习反馈</li>
+        </ol>
+      </div>
+      
+      <h3>界面概览</h3>
+      <ul>
+        <li><strong>顶部信息栏</strong>：显示当前词库名和用户信息</li>
+        <li><strong>搜索框</strong>：支持实时搜索和插队功能</li>
+        <li><strong>学习卡片</strong>：正面显示英文，点击查看中文释义</li>
+        <li><strong>评分按钮</strong>：Easy+（延后） / Easy（简单） / Good（一般） / Hard（困难）</li>
+        <li><strong>侧栏设置</strong>：学习范围、语音设置、统计信息等</li>
+      </ul>
+    </section>
+
+    <section id="integrate" class="card">
+      <h2>1.2 集成与部署</h2>
+      <p>前端以 IIFE 方式输出到 <code>window.AdvVocab</code>，提供完整的挂载/卸载API。</p>
+      <pre><code>&lt;div id="adv-mount"&gt;&lt;/div&gt;
+&lt;script src="/vocab_pro/static/vendor/adv-app.iife.js?v=202508250"&gt;&lt;/script&gt;
+&lt;script&gt;
+  // 推荐用法：只挂载一次，apiBase 自动探测
+  AdvVocab.mountAdvanced({ 
+    el: document.getElementById('adv-mount'), 
+    apiBase: '/vocab/api'  // 可选，支持自动探测
+  });
+&lt;/script&gt;</code></pre>
+      
+      <div class="tip">
+        <strong>部署要点</strong>：
+        <ul>
+          <li><span class="highlight">自动API探测</span>：优先使用传入值 → <code>window.ADV_API_BASE</code> → 脚本路径推断 → <code>/api</code></li>
+          <li><span class="highlight">内置Provider</span>：已包含 <code>ChakraProvider</code>，无需重复包装</li>
+          <li><span class="highlight">版本控制</span>：建议使用时间戳或版本号避免缓存问题</li>
+          <li><span class="highlight">兼容性</span>：支持 React 16+ 和 React 18</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="accounts">
+      <h2>1.3 账号系统</h2>
+      <div class="feature-card">
+        <h4>👤 账号管理</h4>
+        <ul>
+          <li><strong>注册</strong>：用户名+密码，自动创建默认词库</li>
+          <li><strong>登录</strong>：支持"记住密码"功能</li>
+          <li><strong>多设备同步</strong>：学习进度和设置自动同步</li>
+          <li><strong>数据隔离</strong>：每个用户的词库和进度完全独立</li>
+        </ul>
+      </div>
+    </section>
+  </section>
+
+  <!-- ================= 二、界面指南 ================= -->
+  <section id="interface-guide">
+    <h1>二、界面指南</h1>
+
+    <section id="ui">
+      <h2>2.1 界面总览 <span class="version">已更新</span></h2>
+      <div class="feature-card">
+        <h4>🎯 学习区域优化</h4>
+        <ul>
+          <li><strong>主学习卡片突出</strong>：2px蓝色边框设计，hover时轻微上移效果，视觉焦点更明确</li>
+          <li><strong>学习卡片提示</strong>："点击学习卡片"提供清晰的交互指引</li>
+          <li><strong>四按钮评分</strong>：Easy+（延后复现） / Easy（简单） / Good（标准） / Hard（困难）</li>
+          <li><strong>移动端优化</strong>：按钮更宽、间距更合理，移除不必要的标识节省空间</li>
+          <li><strong>中文释义容器最大化</strong>：移动端使用负边距技术扩展释义容器到接近蓝框边界，显著提升阅读体验</li>
+          <li><strong>朗读功能</strong>：自动检测语言，智能选择中英文语音引擎</li>
+          <li><strong>操作提示</strong>：显示快捷键和操作说明</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h4>📊 信息面板重构</h4>
+        <ul>
+          <li><strong>学习统计</strong>：总数/已掌握/基本掌握/未掌握/待学习</li>
+          <li><strong>到期概览</strong>：当前到期数量、下一个到期时间、今日剩余量</li>
+          <li><strong>点击排行榜</strong>：提升为独立功能，与基本设置、高级设置并列显示</li>
+          <li><strong>基本设置</strong>：学习范围、学习顺序、自动朗读、词库名等常用功能</li>
+          <li><strong>高级设置</strong>：语音配置、评分提示时长、优化工具、数据管理等进阶功能</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="pool">
+      <h2>2.2 学习范围设置</h2>
+      <table>
+        <tr>
+          <th>范围选项</th>
+          <th>服务端映射</th>
+          <th>包含词汇</th>
+          <th>适用场景</th>
+        </tr>
+        <tr>
+          <td><strong>All（全部）</strong></td>
+          <td><code>easy</code></td>
+          <td>所有词汇 + 新词补充</td>
+          <td>日常学习、初学阶段</td>
+        </tr>
+        <tr>
+          <td><strong>Good（半熟词）</strong></td>
+          <td><code>good</code></td>
+          <td>评级为Good的词汇</td>
+          <td>巩固提升、查漏补缺</td>
+        </tr>
+        <tr>
+          <td><strong>Hard（错词）</strong></td>
+          <td><code>hard</code></td>
+          <td>低评级词汇 + 错误词汇</td>
+          <td>重点攻克、错题回顾</td>
+        </tr>
+      </table>
+      
+      <div class="tip">
+        <p><strong>智能范围切换</strong>：系统会自动保存和同步当前选择的学习范围，切换后立即生效并清空预取队列。</p>
+      </div>
+    </section>
+
+    <section id="search">
+      <h2>2.3 搜索与导航 <span class="version new">功能增强</span></h2>
+      
+      <div class="feature-card">
+        <h4>🔍 搜索语法</h4>
+        <ul>
+          <li><strong>基础搜索</strong>：直接输入关键词，同时匹配英文和中文</li>
+          <li><strong>字段限定</strong>：<code>en:apple</code>（只搜英文）、<code>zh:苹果</code>（只搜中文）</li>
+          <li><strong>前缀搜索</strong>：<code>en:^app</code>（搜索以"app"开头的英文单词）</li>
+          <li><strong>多词AND</strong>：<code>apple red fruit</code>（必须同时包含所有词）</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h4>🎯 搜索功能</h4>
+        <ul>
+          <li><strong>插队到下一张</strong>：将搜索结果立即插入学习队列</li>
+          <li><strong>设置学习起点</strong>：从指定单词开始按序学习（配合排序模式）</li>
+          <li><strong>加载更多</strong>：支持分页浏览，每次加载20条</li>
+          <li><strong>实时搜索</strong>：280ms防抖，即输即现</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h4>⌨️ 搜索快捷键</h4>
+        <ul>
+          <li><kbd>Enter</kbd>：插队第一条搜索结果</li>
+          <li><kbd>Esc</kbd>：清空搜索并收起下拉框</li>
+          <li><strong>防失焦设计</strong>：点击下拉选项不会使输入框失去焦点</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="keyboard">
+      <h2>2.4 键盘快捷键</h2>
+      <table>
+        <tr>
+          <th>按键</th>
+          <th>功能</th>
+          <th>说明</th>
+        </tr>
+        <tr>
+          <td><kbd>Space</kbd> / <kbd>→</kbd></td>
+          <td>下一张</td>
+          <td>获取下一张学习卡片</td>
+        </tr>
+        <tr>
+          <td><kbd>←</kbd></td>
+          <td>上一张</td>
+          <td>回看历史卡片（最多144张）</td>
+        </tr>
+        <tr>
+          <td><kbd>1</kbd></td>
+          <td>Easy+</td>
+          <td>延后复现（打开菜单选择时长）</td>
+        </tr>
+        <tr>
+          <td><kbd>2</kbd></td>
+          <td>Easy</td>
+          <td>简单，很轻松掌握</td>
+        </tr>
+        <tr>
+          <td><kbd>3</kbd></td>
+          <td>Good</td>
+          <td>标准选择，能回忆但不够熟练</td>
+        </tr>
+        <tr>
+          <td><kbd>4</kbd></td>
+          <td>Hard</td>
+          <td>困难，很吃力需要加强</td>
+        </tr>
+      </table>
+
+      <div class="card">
+        <h3>延后复现快捷键（按1后）</h3>
+        <ul>
+          <li><kbd>Q</kbd>：4周后复现 - 适合比较熟悉的词汇</li>
+          <li><kbd>W</kbd>：3个月后复现 - 适合已经很熟悉的词汇</li>
+          <li><kbd>E</kbd>：1年后复现 - 适合完全掌握的基础词汇</li>
+          <li><kbd>R</kbd>：中期随机 - 13-55天随机延后，归为熟记类型，适合完全掌握但希望随机复现的词汇</li>
+          <li><kbd>Esc</kbd>：取消延后菜单</li>
+        </ul>
+        <div class="warn">
+          <p><strong>延后使用建议</strong>：延后功能适合完全掌握且不希望频繁出现的词汇，使用时请谨慎评估以避免因时间过长而遗忘。中期随机功能特别适合那些已经熟练掌握、但希望保持长期记忆的基础词汇。</p>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ================= 三、学习系统 ================= -->
+  <section id="learning-system">
+    <h1>三、学习系统</h1>
+
+    <section id="rating">
+      <h2>3.1 评分系统与SRS机制</h2>
+      <div class="card">
+        <p>KeepWords 采用 <strong>智能映射的五级SRS系统</strong>：界面提供4个按钮（Easy+/Easy/Good/Hard），系统结合行为数据智能映射为5个等级（Again/Hard/Good/Easy/Very Easy），并据此安排复习间隔。</p>
+      </div>
+
+      <div class="feature-card">
+        <h4>🎯 四按钮设计理念</h4>
+        <ul>
+          <li><strong>Easy+</strong>：极易掌握，希望延后很久再复现（4周/3个月/1年/中期随机）</li>
+          <li><strong>Easy</strong>：很轻松掌握，系统智能映射为Easy或Very Easy</li>
+          <li><strong>Good</strong>：标准选择，能回忆但需要巩固</li>
+          <li><strong>Hard</strong>：很困难，需要加强记忆</li>
+        </ul>
+        <p class="muted">按钮从左到右按掌握程度递增，符合用户直觉操作习惯。其中Easy+提供多种延后选项，包括新增的"中期随机"功能，可在13-55天内随机分配复现时间。</p>
+      </div>
+
+      <h3>五级评分详解</h3>
+      <table>
+        <tr>
+          <th>等级</th>
+          <th>名称</th>
+          <th>起始间隔</th>
+          <th>增长因子</th>
+          <th>适用场景</th>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td><strong>Again</strong></td>
+          <td>0.5小时</td>
+          <td>0.5× (回退)</td>
+          <td>完全不会或立即遗忘</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><strong>Hard</strong></td>
+          <td>1小时</td>
+          <td>1.8×</td>
+          <td>很吃力，需要反复练习</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td><strong>Good</strong></td>
+          <td>3小时</td>
+          <td>2.3×</td>
+          <td>能想起来但不够熟练</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td><strong>Easy</strong></td>
+          <td>24小时</td>
+          <td>3.0×</td>
+          <td>比较轻松，偶需巩固</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td><strong>Very Easy</strong></td>
+          <td>48小时</td>
+          <td>4.0×</td>
+          <td>极其熟悉，长期记忆</td>
+        </tr>
+      </table>
+
+      <div class="feature-card">
+        <h4>🧠 智能映射机制</h4>
+        <p>系统会根据以下行为数据将你的按钮选择映射到具体等级：</p>
+        <ul>
+          <li><strong>反应时间</strong>：桌面端>20秒、移动端>25秒可能降为Again</li>
+          <li><strong>查看释义行为</strong>：查看时间和停留时长影响评级</li>
+          <li><strong>历史表现</strong>：连续Hard或Easy会影响后续映射</li>
+          <li><strong>当前间隔</strong>：已是天级间隔仍觉得Hard，更容易降为Again</li>
+          <li><strong>设备调整</strong>：移动端阈值相对宽松</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h4>⏰ 时间取整规则</h4>
+        <ul>
+          <li><strong>&lt; 6小时</strong>：以0.5小时为单位</li>
+          <li><strong>6-24小时</strong>：以1小时为单位</li>
+          <li><strong>1-14天</strong>：以1天为单位</li>
+          <li><strong>&gt; 14天</strong>：以1周为单位</li>
+        </ul>
+        <p class="muted">合理的时间取整让复习安排更人性化，避免过于精确的时间点。</p>
+      </div>
+    </section>
+
+    <section id="fetching">
+      <h2>3.2 取卡策略与复现算法</h2>
+      
+      <div class="feature-card">
+        <h4>📦 批量预取机制</h4>
+        <ul>
+          <li><strong>优先级</strong>：批量预取(<code>/api/next_cards</code>) → 单卡兜底(<code>/api/next_card</code>) → 空闲倒计时</li>
+          <li><strong>队列管理</strong>：前端维护34张卡片的预取队列，确保学习连贯性</li>
+          <li><strong>软时间窗</strong>：987秒窗口内的将到期卡片一并获取，减少学习割裂感</li>
+          <li><strong>智能补充</strong>：仅在All模式下补充新卡，Good/Hard模式专注复习</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h4>🔄 复现调度算法</h4>
+        <ul>
+          <li><strong>提前补偿</strong>：如果提前学习，会适度减少下次间隔（最大补偿50%）</li>
+          <li><strong>到期聚合</strong>：将临近的到期时间聚合到同一时间段，便于批量学习</li>
+          <li><strong>渐进增长</strong>：间隔时间随掌握程度指数级增长</li>
+          <li><strong>动态调整</strong>：根据历史表现和连续评分动态调整参数</li>
+        </ul>
+      </div>
+
+      <h3>排序模式详细说明</h3>
+      <table>
+        <tr>
+          <th>模式</th>
+          <th>作用范围</th>
+          <th>机制</th>
+          <th>适用场景</th>
+          <th>最佳使用时机</th>
+        </tr>
+        <tr>
+          <td><strong>升序</strong></td>
+          <td rowspan="3">仅影响All模式下的新卡补充顺序</td>
+          <td>按英文字母顺序A→Z</td>
+          <td>系统性学习、基础建设</td>
+          <td>新词库导入后、零基础学习</td>
+        </tr>
+        <tr>
+          <td><strong>降序</strong></td>
+          <td>按英文字母顺序Z→A</td>
+          <td>挑战学习、特殊教学</td>
+          <td>有基础想挑战、配合教学计划</td>
+        </tr>
+        <tr>
+          <td><strong>随机</strong></td>
+          <td>随机抽样，避免重复</td>
+          <td>增加趣味性、避免枯燥</td>
+          <td>长期学习保持新鲜感时</td>
+        </tr>
+      </table>
+
+      <div class="feature-card">
+        <h4>💡 排序模式实用建议</h4>
+        <ul>
+          <li><strong>新手用户</strong>：推荐升序模式，配合"设置学习起点"从简单词汇开始</li>
+          <li><strong>进阶用户</strong>：可尝试随机模式增加挑战性，或降序模式挑战自我</li>
+          <li><strong>考试准备</strong>：升序模式结合词频表，确保重要词汇优先掌握</li>
+          <li><strong>兴趣学习</strong>：随机模式避免枯燥，保持学习动力</li>
+          <li><strong>复习主导期</strong>：排序影响较小，重点关注复习质量</li>
+          <li><strong>新词学习期</strong>：排序效果明显，可根据学习计划灵活切换</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="stats">
+      <h2>3.3 统计与进度追踪</h2>
+      
+      <div class="feature-card">
+        <h4>📈 学习统计</h4>
+        <ul>
+          <li><strong>总数</strong>：词库中的词汇总数</li>
+          <li><strong>已掌握</strong>：达到Very Easy级别的词汇</li>
+          <li><strong>基本掌握</strong>：达到Good级别的词汇</li>
+          <li><strong>未掌握</strong>：Hard/Again级别或有错误记录的词汇</li>
+          <li><strong>待学习</strong>：尚未开始学习的新词汇</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h4>⏰ 到期概览</h4>
+        <ul>
+          <li><strong>当前到期</strong>：现在可以学习的卡片数量</li>
+          <li><strong>下一个到期ETA</strong>：距离下一张卡到期的时间</li>
+          <li><strong>今日剩余量</strong>：今天内将要到期的卡片数量</li>
+          <li><strong>实时更新</strong>：每30秒自动刷新，支持SSE推送</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="time-management">
+      <h2>3.4 时间分布管理 <span class="version new">新功能</span></h2>
+      
+      <div class="feature-card">
+        <h4>📊 时间分布分析</h4>
+        <ul>
+          <li><strong>学习时间范围</strong>：5:00-23:00，合理分配全天学习任务</li>
+          <li><strong>时段统计</strong>：上午(5-10点)/下午(10-16点)/晚间(16-23点)分布情况</li>
+          <li><strong>拥堵点检测</strong>：识别单词过于集中的时间段</li>
+          <li><strong>分布质量评估</strong>：优秀/良好/一般/较差四级评价</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h4>🔧 智能时间优化</h4>
+        <ul>
+          <li><strong>自动识别</strong>：系统自动找出时间拥堵的单词</li>
+          <li><strong>智能分散</strong>：将集中的单词重新分配到空闲时段</li>
+          <li><strong>分配模式</strong>：智能分散或随机分配两种模式</li>
+          <li><strong>保持一致性</strong>：优化后仍保持SRS算法的科学性</li>
+        </ul>
+      </div>
+
+      <div class="tip">
+        <p><strong>使用建议</strong>：建议每周检查一次时间分布，及时优化拥堵时段，提高学习效率。系统会在检测到明显拥堵时提供优化建议。</p>
+      </div>
+    </section>
+  </section>
+
+  <!-- ================= 四、高级功能 ================= -->
+  <section id="features">
+    <h1>四、高级功能</h1>
+
+    <section id="tts">
+      <h2>4.1 智能语音朗读 <span class="version">已优化</span></h2>
+      
+      <div class="feature-card">
+        <h4>🎙️ 语音功能</h4>
+        <ul>
+          <li><strong>自动朗读</strong>：切换卡片时自动朗读（默认关闭）</li>
+          <li><strong>手动朗读</strong>：点击"朗读"按钮随时朗读当前内容</li>
+          <li><strong>智能检测</strong>：基于中文字符占比（30%阈值）自动选择语音引擎</li>
+          <li><strong>语言适配</strong>：显示英文时朗读英文，显示中文时朗读中文</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h4>⚙️ 语音设置</h4>
+        <ul>
+          <li><strong>中文语音</strong>：自动选择/禁用/手动选择语音包</li>
+          <li><strong>英文语音</strong>：自动选择/禁用/手动选择语音包</li>
+          <li><strong>跨语言使用</strong>：支持用一个语音包读两种语言</li>
+          <li><strong>语音测试</strong>：一键测试中英文语音效果</li>
+          <li><strong>智能推荐</strong>：系统推荐最适合的语音包组合</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h4>🔧 语音优化特性</h4>
+        <ul>
+          <li><strong>防抖机制</strong>：避免快速点击造成的语音冲突</li>
+          <li><strong>本地优先</strong>：优先选择系统本地语音包</li>
+          <li><strong>智能fallback</strong>：语音不可用时自动尝试备用方案</li>
+          <li><strong>状态显示</strong>：实时显示语音包可用性和质量</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="markdown">
+      <h2>4.2 Markdown渲染</h2>
+      
+      <div class="feature-card">
+        <h4>📝 支持的语法</h4>
+        <ul>
+          <li><strong>基础格式</strong>：段落、标题（1-6级）、水平分割线</li>
+          <li><strong>文本样式</strong>：<em>斜体</em>、<strong>粗体</strong>、<code>行内代码</code>、~~删除线~~</li>
+          <li><strong>列表</strong>：有序列表、无序列表、任务列表（复选框）</li>
+          <li><strong>引用</strong>：块引用，支持嵌套</li>
+          <li><strong>表格</strong>：完整的表格支持，自动列宽适配</li>
+          <li><strong>代码块</strong>：围栏代码块，支持语言标记</li>
+          <li><strong>链接与图片</strong>：仅允许HTTP(S)链接，新窗口打开</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>示例格式</h3>
+        <pre><code>## 单词解析
+
+**词根**: -spect- (看)
+
+### 记忆方法
+1. 词根联想法
+2. 句子记忆法
+
+> "I **respect** your decision." 
+> 我尊重你的决定。
+
+- [ ] 掌握基础含义
+- [x] 理解词根构成
+
+`注意事项`：区分 respect 和 aspect 的用法。</code></pre>
+      </div>
+    </section>
+
+    <section id="import">
+      <h2>4.3 导入导出与词库管理 <span class="version new">功能增强</span></h2>
+      
+      <div class="feature-card">
+        <h4>📚 词库管理（完整覆盖）</h4>
+        <ul>
+          <li><strong>📥 载入词库（覆盖）</strong>：完全替换当前词库，清除所有学习记录</li>
+          <li><strong>📤 导出词库（完整）</strong>：导出所有词汇的基础信息（不含学习数据）</li>
+          <li><strong>数据格式</strong>：<code>[{"en":"apple","zh":"苹果"}]</code></li>
+          <li><strong>容量限制</strong>：文件≤40MB，自动去重</li>
+          <li><strong>安全提示</strong>：覆盖前需确认，操作不可撤销</li>
+        </ul>
+        <div class="warn">
+          <p><strong>注意</strong>：载入词库将完全替换现有词库并清除所有学习进度，建议先导出备份。</p>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <h4>📖 错词本管理（学习增强）</h4>
+        <ul>
+          <li><strong>📤 导出错词本（低评级）</strong>：导出Hard/Again级别和有错误记录的词汇</li>
+          <li><strong>📈 导出排行榜（含学习统计）</strong>：导出完整学习数据，包含点击统计和复习状态</li>
+          <li><strong>📥 导入错词本（兼容排行榜）</strong>：智能识别格式，支持两种数据类型</li>
+          <li><strong>选项控制</strong>：错词本导出可选择是否包含半熟词（Good级别）</li>
+        </ul>
+        
+        <h5>📊 排行榜导出数据结构</h5>
+        <pre><code>{
+  "导出信息": {
+    "导出时间": "2025-09-13 15:30:22",
+    "用户名": "demo",
+    "词汇总数": 150,
+    "最低点击次数": 1
+  },
+  "排行榜数据": [
+    {
+      "排名": 1,
+      "英文": "example",
+      "中文释义": "例子",
+      "点击次数": 15,
+      "首次点击": "2025-09-01 10:30",
+      "最后点击": "2025-09-13 14:25",
+      "时间跨度": "距首次12天3小时55分钟",
+      "复习状态": {
+        "最后评分": 3,
+        "错误次数": 2,
+        "上次间隔小时": 24.0,
+        "连续Easy次数": 0,
+        "困难连击次数": 1
+      }
+    }
+  ]
+}</code></pre>
+      </div>
+
+      <div class="feature-card">
+        <h4>🔄 智能导入机制</h4>
+        <ul>
+          <li><strong>格式自动识别</strong>：系统自动区分错词本格式和排行榜格式</li>
+          <li><strong>传统错词本</strong>：<code>[{"en":"word","zh":"释义"}]</code> → 增加错误计数</li>
+          <li><strong>排行榜数据</strong>：完整对象格式 → 恢复点击统计、复习状态、学习记录</li>
+          <li><strong>数据合并策略</strong>：
+            <ul>
+              <li>点击统计：保留更大计数和更早/更晚时间</li>
+              <li>复习状态：累加错误次数，保留最新评分和间隔</li>
+              <li>词汇信息：更新到更完整的释义内容</li>
+            </ul>
+          </li>
+          <li><strong>向后兼容</strong>：老格式错词本数据完全兼容，无需修改</li>
+        </ul>
+        
+        <div class="tip">
+          <p><strong>使用建议</strong>：排行榜导出包含完整学习数据，适合备份和迁移；错词本导出仅包含难词，适合专项复习。</p>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <h4>✏️ 词条编辑</h4>
+        <ul>
+          <li><strong>添加生词</strong>：支持批量添加，智能去重</li>
+          <li><strong>编辑释义</strong>：Markdown格式，即时预览</li>
+          <li><strong>编辑词条</strong>：修改英文和中文，重名检测</li>
+          <li><strong>删除词条</strong>：删除词条及其所有学习记录</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h4>📋 数据管理最佳实践</h4>
+        <ol>
+          <li><strong>定期备份</strong>：使用"导出排行榜"功能定期备份完整学习数据</li>
+          <li><strong>错词复习</strong>：使用"导出错词本"提取难词进行专项练习</li>
+          <li><strong>数据迁移</strong>：新设备使用"导入错词本"恢复完整学习状态</li>
+          <li><strong>学习分析</strong>：通过排行榜数据分析学习模式和难点词汇</li>
+        </ol>
+        
+        <div class="pagination-info">
+          <strong>容量限制</strong>：文件大小≤40MB。系统会自动验证格式并提供详细的导入结果反馈。
+        </div>
+      </div>
+    </section>
+
+    <section id="click-stats">
+      <h2>4.4 单词点击统计与排行榜 <span class="version new">新功能</span></h2>
+      
+      <div class="feature-card">
+        <h4>📊 智能点击统计</h4>
+        <ul>
+          <li><strong>自动记录</strong>：点击单词查看释义时自动记录</li>
+          <li><strong>评分时统计</strong>：即使不点击单词，直接评分也会计入统计</li>
+          <li><strong>防重复计数</strong>：34分钟内重复点击同一单词只算一次</li>
+          <li><strong>多设备同步</strong>：登录用户的统计数据在多设备间自动同步</li>
+          <li><strong>时间记录</strong>：记录首次和最近一次点击时间</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h4>🏆 点击排行榜</h4>
+        <ul>
+          <li><strong>分页浏览</strong>：每页显示55个单词，支持"上一批"/"下一批"翻页</li>
+          <li><strong>排名显示</strong>：显示全局排名（如第1-55名、第56-110名等）</li>
+          <li><strong>详细信息</strong>：显示英文、中文释义、点击次数、首次点击时间</li>
+          <li><strong>时间格式优化</strong>：智能显示"距首次N天N小时N分钟"</li>
+          <li><strong>实时刷新</strong>：支持手动刷新获取最新数据</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h4>💡 使用价值</h4>
+        <ul>
+          <li><strong>学习分析</strong>：了解自己最常查看的词汇，发现学习难点</li>
+          <li><strong>复习重点</strong>：高频出现的词汇可能需要重点复习</li>
+          <li><strong>进度追踪</strong>：通过首次点击时间了解学习历程</li>
+          <li><strong>数据备份</strong>：重要的学习行为数据永久保存</li>
+        </ul>
+      </div>
+
+      <div class="tip">
+        <p><strong>访问方式</strong>：在侧栏点击"📊 点击排行榜"即可打开（已提升为独立功能，与基本设置、高级设置并列显示）。排行榜按点击次数降序排列，相同次数时按最近点击时间排序。</p>
+      </div>
+    </section>
+
+    <section id="prefs">
+      <h2>4.5 个性化设置</h2>
+      
+      <table>
+        <tr>
+          <th>设置项</th>
+          <th>选项</th>
+          <th>说明</th>
+          <th>同步</th>
+        </tr>
+        <tr>
+          <td><strong>学习顺序</strong></td>
+          <td>升序/降序/随机</td>
+          <td>仅影响All模式下的新卡补充</td>
+          <td>✅</td>
+        </tr>
+        <tr>
+          <td><strong>学习范围</strong></td>
+          <td>All/Good/Hard</td>
+          <td>限定出题候选集合</td>
+          <td>✅</td>
+        </tr>
+        <tr>
+          <td><strong>词库名</strong></td>
+          <td>自定义文本</td>
+          <td>显示在界面顶部</td>
+          <td>✅</td>
+        </tr>
+        <tr>
+          <td><strong>自动朗读</strong></td>
+          <td>开启/关闭</td>
+          <td>切卡时自动朗读当前内容</td>
+          <td>❌</td>
+        </tr>
+        <tr>
+          <td><strong>语音选择</strong></td>
+          <td>自动/手动/禁用</td>
+          <td>中英文语音包选择</td>
+          <td>❌</td>
+        </tr>
+        <tr>
+          <td><strong>评分提示</strong></td>
+          <td>0-2秒或自定义</td>
+          <td>评分结果显示时长</td>
+          <td>❌</td>
+        </tr>
+      </table>
+
+      <div class="tip">
+        <p><strong>同步说明</strong>：标记✅的设置会在多设备间自动同步，❌的设置仅保存在本地设备。</p>
+      </div>
+    </section>
+
+    <section id="sort-limits">
+      <h2>4.6 排序的作用范围与局限</h2>
+      
+      <div class="warn">
+        <p><strong>重要</strong>：排序模式（升序/降序/随机）仅影响 All 范围下的新卡补充顺序，对复习卡和Good/Hard范围无效。</p>
+      </div>
+
+      <div class="feature-card">
+        <h4>🎯 排序适用的场合</h4>
+        
+        <h5>✅ 排序有效的场合</h5>
+        <ul>
+          <li><strong>初次学习新词库</strong>：刚导入词库，大部分都是新词时</li>
+          <li><strong>学习范围设为All</strong>：确保在会补充新卡的范围内</li>
+          <li><strong>复习负担较轻</strong>：当前到期复习卡数量不多时</li>
+          <li><strong>长期规划学习</strong>：希望按特定顺序逐步推进新词学习</li>
+          <li><strong>搭配"设置学习起点"</strong>：从指定位置开始按序学习</li>
+        </ul>
+
+        <h5>❌ 排序无效或效果不明显的场合</h5>
+        <ul>
+          <li><strong>学习范围为Good/Hard</strong>：这些范围专注复习，不补充新卡</li>
+          <li><strong>复习卡过多</strong>：大量到期卡占主导，新卡很少出现</li>
+          <li><strong>词库学习进度较高</strong>：大部分词汇已学过，新卡稀少</li>
+          <li><strong>软时间窗过大</strong>：过多将到期卡被提前推送</li>
+          <li><strong>预取队列刚切换</strong>：需要消耗完队列中的旧排序卡片</li>
+        </ul>
+
+        <h5>🎯 最佳使用策略</h5>
+        <ul>
+          <li><strong>升序模式</strong>：适合系统性学习，从基础词汇开始，循序渐进</li>
+          <li><strong>降序模式</strong>：适合挑战自我，从难词开始，或配合特定教学计划</li>
+          <li><strong>随机模式</strong>：适合增加学习趣味性，避免枯燥的字母顺序</li>
+          <li><strong>搭配搜索</strong>：先搜索目标词汇"设置学习起点"，再按排序推进</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h4>📍 作用范围详解</h4>
+        <ul>
+          <li><strong>生效条件</strong>：必须在All范围 + 需要补充新卡时才生效</li>
+          <li><strong>无效场景</strong>：Good/Hard范围不补新卡，因此排序无作用</li>
+          <li><strong>复习优先</strong>：到期的复习卡始终按时间顺序优先推送</li>
+          <li><strong>新卡补充逻辑</strong>：只有当批量预取需要新卡填充时，排序才起作用</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h4>❓ 为什么感觉"时灵时不灵"</h4>
+        <ol>
+          <li><strong>复习卡占主导</strong>：复习量大时几乎看不到新卡</li>
+          <li><strong>预取队列缓存</strong>：切换排序后需要消耗完队列中的旧卡</li>
+          <li><strong>软时间窗影响</strong>：987秒窗口内的卡片会被提前推送</li>
+          <li><strong>范围限制</strong>：Good/Hard范围本身就不产生新卡</li>
+        </ol>
+      </div>
+
+      <div class="feature-card">
+        <h4>⚡ 让排序立即生效的方法</h4>
+        <ul>
+          <li><strong>切换到All范围</strong>：确保在会补充新卡的范围内</li>
+          <li><strong>系统会自动清空队列</strong>：切换排序后立即清空预取队列</li>
+          <li><strong>减少复习负担</strong>：先完成部分复习再验证排序效果</li>
+          <li><strong>调整预取参数</strong>：较小的预取限制让排序变化更快显现</li>
+        </ul>
+      </div>
+    </section>
+  </section>
+
+  <!-- ================= 五、API接口文档 ================= -->
+  <section id="api-reference">
+    <h1>五、API接口文档</h1>
+
+    <section id="auth-api">
+      <h2>5.1 认证接口</h2>
+      
+      <div class="feature-card">
+        <h4>🔐 用户认证</h4>
+        
+        <h5>注册 <code>POST /api/register</code></h5>
+        <pre><code>{
+  "username": "string",
+  "password": "string"
+}</code></pre>
+        
+        <h5>登录 <code>POST /api/login</code></h5>
+        <pre><code>{
+  "username": "string", 
+  "password": "string"
+}</code></pre>
+
+        <h5>退出 <code>POST /api/logout</code></h5>
+        <p>无需参数，清除当前会话</p>
+
+        <h5>用户信息 <code>GET /api/me</code></h5>
+        <pre><code>{
+  "logged_in": true,
+  "username": "demo"
+}</code></pre>
+      </div>
+    </section>
+
+    <section id="vocab-api">
+      <h2>5.2 词汇管理接口</h2>
+      
+      <div class="feature-card">
+        <h4>📚 词库操作</h4>
+        
+        <h5>获取词汇列表 <code>GET /api/words</code></h5>
+        <p>返回用户所有词汇的数组</p>
+
+        <h5>搜索词汇 <code>GET /api/search_words</code></h5>
+        <pre><code>参数:
+- q: 搜索关键词，支持 en:/zh: 前缀
+- pool: easy/good/hard (默认easy)
+- limit: 每页数量 (默认20，最大100)
+- offset: 偏移量 (默认0)</code></pre>
+
+        <h5>载入词库 <code>POST /api/custom_words</code></h5>
+        <pre><code>{
+  "words": [
+    {"en": "apple", "zh": "苹果"}
+  ],
+  "deck_name": "我的词库"
+}</code></pre>
+
+        <h5>添加词汇 <code>POST /api/add_word</code></h5>
+        <pre><code>{
+  "en": "word",
+  "zh": "释义",
+  "mode": "prepend" // prepend/append/replace
+}</code></pre>
+      </div>
+    </section>
+
+    <section id="study-api">
+      <h2>5.3 学习接口</h2>
+      
+      <div class="feature-card">
+        <h4>🎯 学习相关</h4>
+        
+        <h5>获取单张卡片 <code>GET /api/next_card</code></h5>
+        <pre><code>参数: pool (easy/good/hard)
+返回: {
+  "type": "review|new|idle",
+  "word": {"id": 1, "en": "word", "zh": "释义"},
+  "next_due_in_seconds": 3600
+}</code></pre>
+
+        <h5>批量获取卡片 <code>GET /api/next_cards</code></h5>
+        <pre><code>参数:
+- pool: easy/good/hard
+- limit: 1-50 (默认10)
+- soft_window_seconds: 0-3600 (默认300)
+- include_new: 1/0 (默认1)</code></pre>
+
+        <h5>提交评分 <code>POST /api/rate</code></h5>
+        <pre><code>{
+  "word_id": 1,
+  "ui": "hard|good|easy",
+  "rt_total_ms": 5000,
+  "used_reveal": true,
+  "pre_reveal_ms": 2000,
+  "def_dwell_ms": 3000,
+  "def_len_chars": 50,
+  "device": "desktop|mobile"
+}</code></pre>
+
+        <h5>延后复现 <code>POST /api/defer</code></h5>
+        <pre><code>{
+  "word_id": 1,
+  "defer_type": "4weeks|3months|1year"
+}</code></pre>
+      </div>
+    </section>
+
+    <section id="analysis-api">
+      <h2>5.4 分析接口</h2>
+      
+      <div class="feature-card">
+        <h4>📊 数据分析</h4>
+        
+        <h5>学习统计 <code>GET /api/stats</code></h5>
+        <pre><code>{
+  "total": 1000,
+  "easy": 200,
+  "good": 300, 
+  "hard": 100,
+  "remain": 400
+}</code></pre>
+
+        <h5>到期概览 <code>GET /api/session_hint</code></h5>
+        <pre><code>{
+  "due_now": 5,
+  "due_next_eta_sec": 1800,
+  "due_today_left": 20
+}</code></pre>
+
+        <h5>时间分布分析 <code>GET /api/time_distribution_analysis</code></h5>
+        <pre><code>参数: date (可选，默认今天)
+返回: {
+  "total_words": 50,
+  "time_slots": {
+    "morning": 15,
+    "afternoon": 20,
+    "evening": 15
+  },
+  "congestion_points": [...],
+  "distribution_quality": "good"
+}</code></pre>
+
+        <h5>重新分配时间 <code>POST /api/redistribute_study_times</code></h5>
+        <pre><code>{
+  "date": "2025-08-25",
+  "mode": "smart|random"
+}</code></pre>
+      </div>
+    </section>
+
+    <section id="stats-api">
+      <h2>5.5 统计接口 <span class="version new">新增</span></h2>
+      
+      <div class="feature-card">
+        <h4>📊 点击统计接口</h4>
+        
+        <h5>记录单词点击 <code>POST /api/word_click_stats/{word_id}</code></h5>
+        <pre><code>参数:
+- word_id: 单词ID (路径参数)
+
+返回: {
+  "updated": true,
+  "count": 3,
+  "lastClickTime": 1693843200000,
+  "firstClickTime": 1693756800000
+}</code></pre>
+        <p class="muted">34分钟内重复点击同一单词不会增加计数</p>
+
+        <h5>获取单词点击统计 <code>GET /api/word_click_stats/{word_id}</code></h5>
+        <pre><code>返回: {
+  "count": 3,
+  "lastClickTime": 1693843200000,
+  "firstClickTime": 1693756800000,
+  "exists": true
+}</code></pre>
+
+        <h5>获取点击排行榜 <code>GET /api/top_clicked_words</code></h5>
+        <pre><code>参数:
+- page: 页码 (默认1)
+- per_page: 每页数量 (默认55，最大100)
+
+返回: {
+  "ok": true,
+  "total_words": 150,
+  "current_page": 1,
+  "per_page": 55,
+  "total_pages": 3,
+  "has_next": true,
+  "has_prev": false,
+  "words": [
+    {
+      "word_id": 123,
+      "en": "example",
+      "zh": "例子",
+      "click_count": 5,
+      "first_click_time": "2025-09-01 10:30",
+      "last_click_time": "2025-09-02 15:45",
+      "time_ago": "距首次1天5小时15分钟"
+    }
+  ]
+}</code></pre>
+
+        <h5>迁移本地统计数据 <code>POST /api/migrate_click_stats</code></h5>
+        <pre><code>{
+  "stats": {
+    "123": {
+      "count": 3,
+      "lastClickTime": 1693843200000,
+      "firstClickTime": 1693756800000
+    }
+  }
+}
+
+返回: {
+  "migrated_count": 5,
+  "skipped_count": 2,
+  "ok": true
+}</code></pre>
+        <p>A: 用于将localStorage中的点击统计数据迁移到服务器</p>
+      </div>
+    </section>
+  </section>
+
+  <!-- ================= 六、帮助中心 ================= -->
+  <section id="help-center">
+    <h1>六、帮助中心</h1>
+
+    <section id="faq">
+      <h2>6.1 常见问题解答</h2>
+    
+      <div class="feature-card">
+        <h4>🎓 学习相关问题</h4>
+        
+        <h5>Q: 为什么我点了Easy，系统显示的却是Good？</h5>
+        <p>A: 系统采用智能映射机制，会结合行为数据（反应时间、查看释义行为等）将3档按钮映射到5级评分。查看释义或反应时间长会影响最终评级。</p>
+
+        <h5>Q: Easy+和Easy按钮有什么区别？</h5>
+        <p>A: Easy按钮会智能映射到系统5级评分；Easy+是延后复现功能，直接将词汇推迟到4周/3个月/1年后，适合完全掌握的词汇。</p>
+
+        <h5>Q: 什么时候使用延后复现？</h5>
+        <p>A: 当某个词汇完全掌握，不希望短期内再次出现时。比如基础词汇、已经烂熟的单词。但要谨慎使用，避免因延后时间过长而遗忘。</p>
+
+        <h5>Q: 为什么设置了随机模式但感觉还是有序的？</h5>
+        <p>A: 排序只影响All模式下的新卡补充。如果当前复习卡较多，或者在Good/Hard模式下，排序设置不会生效。建议在All模式下且完成部分复习后验证排序效果。</p>
+
+        <h5>Q: 什么情况下排序功能最有效？</h5>
+        <p>A: <strong>最佳使用场合</strong>：1) 刚导入新词库时；2) 学习范围设为All；3) 复习负担不重时；4) 配合"设置学习起点"功能。<strong>无效场合</strong>：Good/Hard范围、复习卡过多、词库学习进度很高的情况下。</p>
+
+        <h5>Q: 升序、降序、随机模式分别适合什么学习方式？</h5>
+        <p>A: <strong>升序</strong>：适合系统性学习，从A开头的基础词汇循序渐进；<strong>降序</strong>：适合挑战性学习，从Z开头或按教学计划逆向进行；<strong>随机</strong>：适合增加趣味性，避免字母顺序的枯燥感。</p>
+
+        <h5>Q: 点击统计功能有什么用？</h5>
+        <p>A: 点击统计帮助你了解学习行为：1) <strong>发现难点</strong>：高频出现的词汇可能是学习难点；2) <strong>复习重点</strong>：点击次数多的词汇需要重点复习；3) <strong>学习历程</strong>：通过首次点击时间了解自己的学习历程；4) <strong>数据分析</strong>：为个性化学习提供数据支持。</p>
+
+        <h5>Q: 为什么我没有点击单词，但排行榜中也有记录？</h5>
+        <p>A: 系统设计为即使不点击单词查看释义，只要对单词进行评分（Easy+/Easy/Good/Hard），也会自动记录为一次点击。这样可以更全面地统计你与单词的交互情况。</p>
+
+        <h5>Q: 点击统计的"34分钟内重复点击"规则是什么？</h5>
+        <p>A: 为了避免误操作或短时间内的重复点击影响统计准确性，系统设定34分钟内对同一单词的重复点击只计算一次。但会更新最近点击时间。这个时间间隔采用斐波那契数列值，平衡了去重需求与学习频率。</p>
+
+        <h5>Q: 新版界面的主要变化有哪些？</h5>
+        <p>A: v2.2.3主要进行了移动端优化：1) <strong>中文释义容器最大化</strong>：移动端中文释义宽度优化，使用负边距技术扩展到接近蓝框边界；2) <strong>兼容性增强</strong>：添加fetch API polyfill，解决旧浏览器兼容性问题；3) <strong>缓存同步优化</strong>：修复单词编辑后缓存不同步问题，词库缓存和预取队列实时更新；4) <strong>构建优化</strong>：本地化CDN依赖，提升加载速度和稳定性。</p>
+
+        <h5>Q: 为什么要把点击排行榜提升为独立功能？</h5>
+        <p>A: 点击排行榜是重要的学习分析工具，能帮助用户了解学习难点和复习重点。将其提升到与基本设置、高级设置并列的位置，让用户更容易访问这个有价值的功能，提升学习效率。</p>
+
+        <h5>Q: 主学习卡片的蓝色边框有什么作用？</h5>
+        <p>A: 2px蓝色边框设计让学习卡片成为页面的视觉焦点，帮助用户快速定位到最重要的学习内容。配合hover时的轻微上移效果，提供更好的交互反馈，让学习过程更加专注。</p>
+
+        <h5>Q: v2.2.5版本的缓存同步机制有什么重大改进？</h5>
+        <p>A: v2.2.5在缓存同步方面实现了重大突破：1) <strong>实时同步</strong>：编辑词条或释义后立即更新词库缓存和预取队列，无需刷新页面；2) <strong>智能调试</strong>：增加详细的控制台日志，实时跟踪缓存更新状态；3) <strong>全面覆盖</strong>：同时更新所有相关数据结构，确保数据一致性；4) <strong>性能提升</strong>：避免频繁重新加载整个词库，只更新变更的部分。</p>
+
+        <h5>Q: 移动端中文释义容器最大化技术原理是什么？</h5>
+        <p>A: v2.2.5采用响应式负边距技术实现：1) <strong>负边距扩展</strong>：使用mx: -8（左右各-32px）突破容器限制；2) <strong>宽度计算</strong>：w: calc(100% + 64px)精确计算扩展后宽度；3) <strong>视觉增强</strong>：添加半透明背景、圆角边框和阴影效果；4) <strong>响应式适配</strong>：桌面端保持原样，移动端专门优化。这项技术显著提升了移动端长段落中文释义的阅读体验。</p>
+
+        <h5>Q: v2.2.5的性能优化具体体现在哪些方面？</h5>
+        <p>A: 多项性能提升：1) <strong>加载时间优化</strong>：等待超时从6秒缩短到3秒，提升响应速度；2) <strong>首屏加载策略</strong>：分阶段预取机制，优先保证首张卡片快速显示；3) <strong>Markdown渲染优化</strong>：移动端专门的扁平化显示策略，减少嵌套层级；4) <strong>滚动性能增强</strong>：统一滚动函数，智能判断设备类型选择最优滚动方案。</p>
+
+        <h5>Q: fetch兼容性问题如何解决？</h5>
+        <p>A: v2.2.3通过以下方案解决fetch API兼容性问题：1) <strong>本地polyfill</strong>：内置core-js和fetch专用polyfill文件；2) <strong>双重保障</strong>：先加载完整polyfill，再加载fetch专用版本；3) <strong>本地化部署</strong>：避免CDN依赖，确保离线可用；4) <strong>全浏览器支持</strong>：覆盖Android 4.x、iOS Safari旧版本等环境。</p>
+
+        <h5>Q: 缓存同步机制有什么改进？</h5>
+        <p>A: v2.2.3优化了编辑后的缓存同步：1) <strong>实时同步</strong>：编辑单词或释义后立即更新所有相关缓存；2) <strong>全面覆盖</strong>：同时更新词库缓存和预取队列中的数据；3) <strong>调试友好</strong>：添加控制台日志，便于跟踪同步状态；4) <strong>无需刷新</strong>：修改后无需刷新页面即可看到最新内容。</p>
+
+        <h5>Q: 基本设置和高级设置如何区分？</h5>
+        <p>A: <strong>基本设置</strong>包含日常学习的常用功能：学习范围、学习顺序、自动朗读、词库名等；<strong>高级设置</strong>包含进阶功能：语音配置、评分提示时长、优化工具、数据管理等。这样的分类让新手用户更容易上手，高级用户也能快速找到所需功能。</p>
+
+        <h5>Q: 点击排行榜功能的最佳使用方法？</h5>
+        <p>A: 建议定期查看点击排行榜：1) <strong>识别难点</strong>：点击次数多的单词可能是学习难点；2) <strong>制定复习计划</strong>：针对高频单词制定专门的复习策略；3) <strong>追踪进步</strong>：通过首次点击时间了解学习历程；4) <strong>调整学习方法</strong>：根据点击模式优化学习策略。</p>
+
+        <h5>Q: 为什么学习卡片提示改为"点击学习卡片"？</h5>
+        <p>A: 原来的"学习卡片"只是标识，新的"点击学习卡片"提供了明确的交互指引，帮助用户（特别是新用户）理解可以点击卡片来切换中英文显示，提升用户体验和操作直观性。</p>
+      </div>
+
+      <div class="feature-card">
+        <h4>🎯 功能使用问题</h4>
+        
+        <h5>Q: 朗读功能无效怎么办？</h5>
+        <p>A: 检查：1) 设备音量；2) 浏览器是否允许自动播放；3) 在语音设置中选择合适的语音包；4) 点击测试按钮验证语音功能。</p>
+
+        <h5>Q: 搜索找不到明明存在的词？</h5>
+        <p>A: 检查：1) 当前学习范围是否过滤了该词；2) 使用 en:/zh: 前缀精确搜索；3) 确认大小写和拼写；4) 该词可能在其他用户的词库中。</p>
+
+        <h5>Q: 导入词库时提示格式错误？</h5>
+        <p>A: 确保JSON格式正确：<code>[{"en":"apple","zh":"苹果"}]</code>。常见错误：缺少方括号、属性名未用双引号、编码问题、文件过大。</p>
+
+        <h5>Q: 时间分布优化有什么作用？</h5>
+        <p>A: 帮助将过于集中的学习任务分散到全天，避免某些时段负担过重。建议定期检查并优化时间分布，提高学习效率。</p>
+
+        <h5>Q: 点击统计数据在不同设备间同步吗？</h5>
+        <p>A: 是的。登录用户的点击统计数据会自动在多设备间同步。系统会智能合并本地数据和服务器数据，确保统计信息的准确性和完整性。</p>
+
+        <h5>Q: 如何查看单词的详细点击信息？</h5>
+        <p>A: 在学习卡片下方会显示当前单词的点击统计信息，格式为"第N次出现，距首次X天X小时X分钟"。要查看所有单词的排行榜，请点击侧栏的"📊 点击排行榜"按钮。</p>
+
+        <h5>Q: 排行榜中的时间显示格式有什么特点？</h5>
+        <p>A: 系统采用智能时间显示：小于1分钟显示秒数，超过1分钟显示分钟+秒，超过1小时显示小时+分钟，超过1天显示天数+小时。这样更直观地反映学习历程。</p>
+      </div>
+
+      <div class="feature-card">
+        <h4>📁 导入导出问题</h4>
+        
+        <h5>Q: 载入词库和导入错词本有什么区别？</h5>
+        <p>A: <strong>载入词库</strong>：完全覆盖现有词库，清除所有学习记录，用于替换整个词库；<strong>导入错词本</strong>：添加到现有词库，保留学习记录，支持两种格式的智能识别。</p>
+
+        <h5>Q: 什么时候使用"导出排行榜"功能？</h5>
+        <p>A: 导出排行榜适合：1) <strong>完整备份</strong>：保存所有学习数据包括点击统计和复习状态；2) <strong>数据迁移</strong>：换设备时恢复完整学习进度；3) <strong>学习分析</strong>：导出数据进行个人学习模式分析。</p>
+
+        <h5>Q: 导入排行榜数据会覆盖现有数据吗？</h5>
+        <p>A: 不会完全覆盖。系统采用智能合并策略：1) <strong>点击统计</strong>：保留更大的计数和更早/更晚的时间；2) <strong>复习状态</strong>：累加错误次数，保留最佳学习记录；3) <strong>词汇信息</strong>：更新为更完整的释义。</p>
+
+        <h5>Q: 如何确保导入的数据格式正确？</h5>
+        <p>A: 系统支持两种格式：1) <strong>传统错词本</strong>：<code>[{"en":"word","zh":"释义"}]</code>；2) <strong>排行榜格式</strong>：包含"导出信息"和"排行榜数据"的完整对象。系统会自动识别格式并给出详细的导入结果反馈。</p>
+
+        <h5>Q: 导入后没有看到预期的学习数据怎么办？</h5>
+        <p>A: 检查：1) 确认导入成功提示中的数据条数；2) 刷新页面或重新登录；3) 检查导入文件是否为排行榜格式（包含复习状态数据）；4) 查看导入反馈中的错误信息。</p>
+
+        <h5>Q: 可以同时导入多个排行榜文件吗？</h5>
+        <p>A: 可以分别导入。由于采用智能合并策略，多次导入不会重复计数，系统会自动保留最优的学习记录和最大的点击统计。</p>
+
+        <h5>Q: 导出的排行榜文件很大怎么办？</h5>
+        <p>A: 可以在导出时设置最低点击次数过滤，只导出高频词汇。另外，系统限制文件≤40MB，如超过限制建议分批导出或删除部分无效数据。</p>
+      </div>
+
+      <div class="feature-card">
+        <h4>⚙️ 技术问题</h4>
+        
+        <h5>Q: 不同设备间数据不同步？</h5>
+        <p>A: 确保：1) 使用相同账号登录；2) 保持网络连接；3) 避免同时多设备操作；4) 定期刷新页面获取最新数据。部分设置（如语音选择）仅保存在本地。</p>
+
+        <h5>Q: 移动端按钮太小？</h5>
+        <p>A: 新版已优化移动端布局，四个按钮会自动调整大小。也可使用键盘快捷键：1=Easy+，2=Easy，3=Good，4=Hard。</p>
+
+        <h5>Q: 页面加载慢或出错？</h5>
+        <p>A: 尝试：1) 清除浏览器缓存；2) 刷新页面；3) 更换浏览器；4) 检查网络连接；5) 确认脚本文件版本。</p>
+      </div>
+    </section>
+
+    <section id="troubleshooting">
+      <h2>6.2 故障排除</h2>
+      
+      <div class="feature-card">
+        <h4>🔧 常见故障及解决方案</h4>
+        
+        <table>
+          <tr>
+            <th>问题现象</th>
+            <th>可能原因</th>
+            <th>解决方案</th>
+          </tr>
+          <tr>
+            <td>无法登录</td>
+            <td>密码错误/网络问题</td>
+            <td>检查用户名密码，清除cookies重试</td>
+          </tr>
+          <tr>
+            <td>朗读无声音</td>
+            <td>语音包缺失/浏览器限制</td>
+            <td>检查系统音量，安装语音包，允许自动播放</td>
+          </tr>
+          <tr>
+            <td>搜索无结果</td>
+            <td>范围过滤/关键词错误</td>
+            <td>切换到All范围，使用en:/zh:前缀</td>
+          </tr>
+          <tr>
+            <td>导入失败</td>
+            <td>格式错误/文件过大</td>
+            <td>检查JSON格式，确保文件&lt;40MB</td>
+          </tr>
+          <tr>
+            <td>排序无效</td>
+            <td>复习卡占主导/范围限制</td>
+            <td>切换到All范围，完成部分复习后验证</td>
+          </tr>
+          <tr>
+            <td>统计数据异常</td>
+            <td>网络延迟/缓存问题</td>
+            <td>刷新页面，检查网络连接</td>
+          </tr>
+          <tr>
+            <td>点击排行榜无数据</td>
+            <td>尚未有点击记录/数据同步延迟</td>
+            <td>开始学习单词，等待数据同步，刷新排行榜</td>
+          </tr>
+          <tr>
+            <td>缓存同步异常</td>
+            <td>编辑后数据不更新/多设备冲突</td>
+            <td>刷新页面，检查网络，避免多设备同时编辑</td>
+          </tr>
+          <tr>
+            <td>移动端显示问题</td>
+            <td>容器过窄/布局异常</td>
+            <td>检查浏览器缩放，刷新页面，使用现代浏览器</td>
+          </tr>
+          <tr>
+            <td>缓存更新延迟</td>
+            <td>编辑后数据未立即显示/网络延迟</td>
+            <td>查看控制台日志确认同步状态，检查网络连接</td>
+          </tr>
+          <tr>
+            <td>移动端释义容器显示异常</td>
+            <td>负边距技术兼容性/CSS样式冲突</td>
+            <td>清除浏览器缓存，使用现代移动浏览器</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="feature-card">
+        <h4>📞 获取帮助</h4>
+        <ul>
+          <li><strong>在线文档</strong>：查阅本帮助文档的相关章节</li>
+          <li><strong>邮件支持</strong>：在 GitHub 项目页面提交 Issue</li>
+          <li><strong>问题反馈</strong>：描述问题时请包含浏览器版本、操作系统、错误截图</li>
+          <li><strong>功能建议</strong>：欢迎提出改进建议和新功能需求</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="changelog">
+      <h2>6.3 版本更新记录</h2>
+      
+      <div class="feature-card">
+        <h4>📅 最新版本</h4>
+        
+        <h5>v2.2.5（2025-10-05）<span class="version new">当前版本</span></h5>
+        <ul>
+          <li><strong>移动端中文释义显示革命性优化</strong>：使用负边距技术（mx: -8, w: calc(100% + 64px)）最大化释义容器宽度</li>
+          <li><strong>缓存同步机制全面改进</strong>：编辑词条后立即同步更新词库缓存和预取队列，无需刷新页面</li>
+          <li><strong>性能优化多项提升</strong>：加载等待时间从6秒优化到3秒，首屏加载分阶段预取策略</li>
+          <li><strong>移动端响应式增强</strong>：Markdown渲染针对移动端专门优化，扁平化显示提升可读性</li>
+          <li><strong>调试与监控完善</strong>：增加详细的控制台日志，便于跟踪缓存更新和数据同步状态</li>
+          <li><strong>代码结构优化</strong>：统一滚动函数，优化双击检测，增强移动端交互体验</li>
+        </ul>
+
+        <h5>v2.2.3（2025-09-21）</h5>
+        <ul>
+          <li><strong>移动端中文释义容器优化</strong>：使用负边距技术最大化宽度，扩展到接近蓝框边界，显著提升阅读体验</li>
+          <li><strong>浏览器兼容性增强</strong>：添加fetch API polyfill，支持Android 4.x、iOS Safari旧版本等环境</li>
+          <li><strong>本地化依赖部署</strong>：CDN资源本地化，包含core-js和fetch专用polyfill，提升加载稳定性</li>
+          <li><strong>缓存同步机制优化</strong>：修复单词编辑后缓存不同步问题，实时更新词库缓存和预取队列</li>
+          <li><strong>移动端视觉优化</strong>：中文释义容器添加半透明背景、圆角边框和阴影，提升可读性</li>
+          <li><strong>构建流程完善</strong>：优化编译配置，确保新功能稳定运行</li>
+        </ul>
+
+        <h5>v2.2.2（2025-09-13）</h5>
+        <ul>
+          <li><strong>排行榜完整数据导入</strong>：新增完整学习数据导入功能，支持点击统计和复习状态的完整恢复</li>
+          <li><strong>智能格式识别</strong>：导入功能自动识别传统错词本格式和排行榜格式，确保向后兼容</li>
+          <li><strong>数据合并策略优化</strong>：导入时智能合并数据，保留最佳学习记录和最大点击统计</li>
+          <li><strong>按钮文本优化</strong>：精简按钮文字避免界面宽度溢出，"导出排行榜"增加"含学习统计"说明</li>
+          <li><strong>文档内容完善</strong>：新增详细的导入导出指导和FAQ，提供清晰的数据管理最佳实践</li>
+          <li><strong>API接口增强</strong>：新增<code>/api/import_ranking_complete</code>端点，支持完整学习数据导入</li>
+        </ul>
+
+        <h5>v2.2.1（2025-09-03）</h5>
+        <ul>
+          <li><strong>主学习卡片视觉强化</strong>：2px蓝色边框设计，hover时轻微上移动效，突出学习焦点</li>
+          <li><strong>学习提示优化</strong>：将"学习卡片"改为"点击学习卡片"，提供更明确的交互指引</li>
+          <li><strong>移动端界面优化</strong>：四个评分按钮更宽、间距更合理，移除手机端"学习评价"标识节省空间</li>
+          <li><strong>点击排行榜提升</strong>：从高级设置中独立出来，与基本设置、高级设置并列，便于快速访问</li>
+          <li><strong>设置面板重构</strong>：基本设置（常用功能）和高级设置（进阶功能）分类更清晰</li>
+          <li><strong>顶部导航优化</strong>：更新为""Sofia背单词"登录入口"，品牌标识更明确</li>
+        </ul>
+
+        <h5>v2.2.0（2025-09-02）</h5>
+        <ul>
+          <li><strong>新增点击统计排行榜分页</strong>：支持分页浏览所有点击记录，每页55个单词</li>
+          <li><strong>优化时间显示格式</strong>：智能显示"距首次N天N小时N分钟"</li>
+          <li><strong>完善单词点击统计功能</strong>：自动记录评分时点击，10分钟防重复</li>
+          <li><strong>增强API接口</strong>：新增点击统计相关的完整RESTful API</li>
+          <li><strong>多设备数据同步</strong>：点击统计数据在多设备间智能同步合并</li>
+          <li><strong>文档全面更新</strong>：新增点击统计功能说明和相关问题解答</li>
+        </ul>
+
+        <h5>v2.1.0（2025-08-25）</h5>
+        <ul>
+          <li><strong>新增时间分布管理</strong>：时间分布分析、智能优化、拥堵点检测</li>
+          <li><strong>API文档完善</strong>：新增完整的RESTful API参考文档</li>
+          <li><strong>语音设置优化</strong>：更直观的语音包选择界面和测试功能</li>
+          <li><strong>帮助文档重构</strong>：全面更新文档结构，新增故障排除章节</li>
+          <li><strong>界面微调</strong>：优化移动端显示效果，改善用户体验</li>
+        </ul>
+
+        <h5>v2.0.2（2025-08-25）</h5>
+        <ul>
+          <li>新增排序作用范围说明，解释"时灵时不灵"现象</li>
+          <li>优化预取参数建议，帮助用户更好验证排序效果</li>
+          <li>完善常见问题答疑，特别是学习策略相关</li>
+        </ul>
+
+        <h5>v2.0.1（2025-08-24）</h5>
+        <ul>
+          <li>按钮布局优化：从易到难排列为 Easy+/Easy/Good/Hard</li>
+          <li>快捷键重新映射：1=Easy+，2=Easy，3=Good，4=Hard</li>
+          <li>品牌标识统一：更名为"Sofia背单词"</li>
+          <li>界面文案优化：提升用户理解和操作便利性</li>
+        </ul>
+
+        <h5>v2.0.0（2025-08-24）</h5>
+        <ul>
+          <li><strong>重大界面升级</strong>：四按钮评分系统（Easy+/Easy/Good/Hard）</li>
+          <li><strong>新增延后复现</strong>：支持4周/3个月/1年延后选项</li>
+          <li><strong>完整键盘支持</strong>：包括延后菜单快捷键（Q/W/E）</li>
+          <li><strong>移动端优化</strong>：四按钮保持一行布局，响应式适配</li>
+          <li><strong>后端新接口</strong>：/api/defer 集成SRS算法保持一致性</li>
+        </ul>
+      </div>
+
+      <div class="feature-card">
+        <h4>📋 历史版本</h4>
+        
+        <details>
+          <summary>查看更多版本历史</summary>
+          
+          <h5>v1.9.2（2025-08-22）</h5>
+          <ul>
+            <li>语音功能全面升级：智能中英文自动检测</li>
+            <li>优化语言检测算法：基于30%阈值的精准判断</li>
+            <li>统一朗读接口：自动和手动朗读智能内容选择</li>
+          </ul>
+
+          <h5>v1.9.1（2025-08-21）</h5>
+          <ul>
+            <li>详细补充SRS算法说明：参数表、时间演进、取整规则</li>
+            <li>优化移动端布局：按钮一行显示，提示框位置调整</li>
+            <li>缩短评分提示时间：从3秒优化到1.5秒</li>
+          </ul>
+
+          <h5>v1.9（2025-08-21）</h5>
+          <ul>
+            <li>统一挂载方式：AdvVocab.mountAdvanced，内置ChakraProvider</li>
+            <li>新增文档章节：集成部署、快捷键、导入导出、SRS机制</li>
+            <li>到期概览增强：定时刷新，支持SSE推送</li>
+          </ul>
+
+          <h5>v1.8（2025-08-19）</h5>
+          <ul>
+            <li>搜索功能增强：加载更多分页、即输即现、范围联动</li>
+            <li>防失焦设计：下拉框交互优化</li>
+            <li>快捷键支持：Enter插队、Esc清空</li>
+          </ul>
+        </details>
+      </div>
+    </section>
+  </section>
+
+  <hr />
+  <footer class="muted">
+    <p>© Sofia背单词</p>
+    <p>本文档持续更新中，如有疑问请在 GitHub 项目页面提交 Issue</p>
+  </footer>
+
+  <!-- 顶部导航链接的自动推断与可配置覆盖 -->
+  <script>
+    (function(){
+      try{
+        var home = (typeof window.KW_HOME_URL === "string" && window.KW_HOME_URL) ? window.KW_HOME_URL : null;
+        var app  = (typeof window.KW_APP_URL  === "string" && window.KW_APP_URL ) ? window.KW_APP_URL  : null;
+
+        var path = location.pathname || "/";
+        var i = path.indexOf("/static/");
+        var prefix = i > 0 ? path.slice(0, i) : "";
+
+        if (!home) home = prefix || "/";
+        if (!app)  app  = "http://fjzxedu.top:5002/vocab/";
+      }catch(e){}
+      try{
+        var aHome = document.getElementById("nav-home");
+        var aApp  = document.getElementById("nav-app");
+        if (aHome) aHome.href = home;
+        if (aApp)  aApp.href  = app;
+      }catch(e){}
+    })();
+  </script>
+</body>
+</html>

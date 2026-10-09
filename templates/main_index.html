@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <meta name="format-detection" content="telephone=no,email=no,address=no" />
+  <title>Sofia背单词 - 智能单词学习系统</title>
+  <link rel="icon" href="{{ url_for('vocab.static', filename='s2.ico') }}" />
+  
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #10b981;
+      --secondary-dark: #059669;
+      --neutral-50: #fafafa;
+      --neutral-100: #f5f5f5;
+      --neutral-200: #e5e5e5;
+      --neutral-300: #d4d4d4;
+      --neutral-400: #a3a3a3;
+      --neutral-500: #737373;
+      --neutral-600: #525252;
+      --neutral-700: #404040;
+      --neutral-800: #262626;
+      --neutral-900: #171717;
+      --accent: #3b82f6;
+      --accent-light: #dbeafe;
+      --border-radius: 16px;
+      --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html, body {
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      line-height: 1.6;
+      color: var(--neutral-800);
+      /* 现代字体渲染 */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    /* 添加动态背景效果 */
+    html::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+      animation: float 6s ease-in-out infinite alternate;
+      z-index: -1;
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-20px) rotate(2deg); }
+    }
+    
+    /* 主容器 */
+    .container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* 顶部导航栏 */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--neutral-200);
+      margin-bottom: 64px;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+    }
+    
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+    }
+    
+    .logo-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    
+    .nav {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+    
+    .nav-link {
+      color: var(--neutral-600);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease;
+      font-size: 0.95rem;
+    }
+    
+    .nav-link:hover {
+      color: var(--primary);
+    }
+    
+    /* 主内容区域 */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 40px 0;
+    }
+    
+    /* 顶部标签 */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-light);
+      color: var(--primary);
+      padding: 8px 16px;
+      border-radius: 24px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 32px;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+    
+    /* 主标题区域 */
+    .hero-title {
+      font-size: 3.75rem;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.025em;
+      margin-bottom: 24px;
+      background: linear-gradient(45deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradient-shift 4s ease-in-out infinite;
+      position: relative;
+      text-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+      filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
+    }
+    
+    .hero-title::before {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      z-index: -1;
+      filter: blur(3px);
+      opacity: 0.6;
+    }
+    
+    @keyframes gradient-shift {
+      0%, 100% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+    }
+    
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--neutral-600);
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    
+    .hero-description {
+      font-size: 1.125rem;
+      color: var(--neutral-500);
+      max-width: 600px;
+      margin: 0 auto 48px auto;
+      line-height: 1.7;
+    }
+    
+    /* 主要按钮 */
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      padding: 20px 40px;
+      border-radius: var(--border-radius);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.125rem;
+      box-shadow: var(--shadow-lg), 0 0 20px rgba(37, 99, 235, 0.3);
+      transition: all 0.3s ease;
+      margin-bottom: 64px;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .cta-button:hover::before {
+      left: 100%;
+    }
+    
+    .cta-button:hover {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-xl), 0 0 30px rgba(37, 99, 235, 0.4);
+    }
+    
+    /* 功能卡片网格 */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+      max-width: 900px;
+      width: 100%;
+      margin-bottom: 64px;
+    }
+    
+    .feature-card {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 32px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+      text-align: left;
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+    
+    .feature-card:hover::before {
+      transform: scaleX(1);
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-xl), 0 0 25px rgba(37, 99, 235, 0.15);
+      border-color: rgba(59, 130, 246, 0.3);
+      background: rgba(255, 255, 255, 0.95);
+    }
+    
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--accent-light) 0%, rgba(59, 130, 246, 0.1) 100%);
+      border: 2px solid rgba(59, 130, 246, 0.2);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      margin-bottom: 24px;
+      color: var(--primary);
+      transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover .feature-icon {
+      transform: scale(1.1) rotate(5deg);
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      border-color: transparent;
+    }
+    
+    .feature-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--neutral-800);
+      margin-bottom: 12px;
+    }
+    
+    .feature-description {
+      color: var(--neutral-600);
+      line-height: 1.6;
+    }
+    
+    /* 快速导航 */
+    .quick-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      max-width: 800px;
+      width: 100%;
+      margin-bottom: 48px;
+    }
+    
+    .quick-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 16px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--neutral-700);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transition: all 0.3s ease;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .quick-nav-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .quick-nav-item:hover::before {
+      opacity: 1;
+    }
+    
+    .quick-nav-item:hover {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: var(--accent);
+      color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(37, 99, 235, 0.15);
+    }
+    
+    .quick-nav-icon {
+      font-size: 1.25rem;
+    }
+    
+    /* 页脚 */
+    .footer {
+      border-top: 1px solid var(--neutral-200);
+      padding: 32px 0;
+      text-align: center;
+      color: var(--neutral-500);
+      font-size: 0.875rem;
+      margin-top: auto;
+    }
+    
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 16px;
+    }
+    
+    .footer-link {
+      color: var(--neutral-500);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    
+    .footer-link:hover {
+      color: var(--primary);
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 16px;
+      }
+      
+      .header {
+        flex-direction: column;
+        gap: 16px;
+        margin-bottom: 40px;
+      }
+      
+      .nav {
+        gap: 20px;
+      }
+      
+      .hero-title {
+        font-size: 2.5rem;
+      }
+      
+      .hero-subtitle {
+        font-size: 1.125rem;
+      }
+      
+      .hero-description {
+        font-size: 1rem;
+        margin-bottom: 32px;
+      }
+      
+      .cta-button {
+        padding: 16px 32px;
+        font-size: 1rem;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      
+      .feature-card {
+        padding: 24px;
+      }
+      
+      /* 手机端快速导航：前三个一行，帮助单独一行 */
+      .quick-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        max-width: 100%;
+        width: 100%;
+      }
+      
+      .quick-nav-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+      
+      .quick-nav-item {
+        flex-direction: column;
+        text-align: center;
+        padding: 12px 8px;
+        font-size: 0.75rem;
+        line-height: 1.3;
+        min-height: 70px;
+        justify-content: center;
+        gap: 6px;
+      }
+      
+      .quick-nav-icon {
+        font-size: 1.5rem;
+        margin-bottom: 4px;
+      }
+      
+      .help-nav-item {
+        width: 100%;
+        max-width: 280px;
+        margin: 0 auto;
+        flex-direction: row;
+        text-align: left;
+        padding: 14px 20px;
+        font-size: 0.9rem;
+        min-height: auto;
+        gap: 12px;
+      }
+      
+      .help-nav-item .quick-nav-icon {
+        font-size: 1.25rem;
+        margin-bottom: 0;
+      }
+      
+      .footer-links {
+        flex-direction: column;
+        gap: 12px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .hero-title {
+        font-size: 2rem;
+      }
+      
+      .hero-subtitle {
+        font-size: 1rem;
+      }
+      
+      .badge {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+      }
+      
+      .cta-button {
+        padding: 14px 28px;
+        font-size: 0.95rem;
+      }
+      
+      /* 超小屏幕的快速导航优化 */
+      .quick-nav-row {
+        gap: 6px;
+      }
+      
+      .quick-nav-item {
+        padding: 10px 6px;
+        font-size: 0.7rem;
+        min-height: 65px;
+        gap: 4px;
+      }
+      
+      .quick-nav-icon {
+        font-size: 1.3rem;
+      }
+      
+      .help-nav-item {
+        max-width: 260px;
+        padding: 12px 16px;
+        font-size: 0.85rem;
+      }
+      
+      .help-nav-item .quick-nav-icon {
+        font-size: 1.1rem;
+      }
+    }
+    
+    /* 滚动行为优化 */
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    /* 加载动画 */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .animate-fade-in {
+      animation: fadeInUp 0.6s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 顶部导航 -->
+    <header class="header">
+      <a href="http://fjzxedu.top:5002" class="logo">
+        <div class="logo-icon">
+          <img src="{{ url_for('vocab.static', filename='s2.png') }}" alt="Sofia Logo" onerror="this.style.display='none'" />
+        </div>
+        Sofia
+      </a>
+      <nav class="nav">
+        <a href="/" class="nav-link">数智平台</a>
+        <a href="http://fjzxedu.top:5002/learn/login" class="nav-link">智能学习</a>
+        <a href="http://fjzxedu.top:5002/db_analytics/" class="nav-link">学习报告</a>
+        <a href="/vocab/keepwords.html" class="nav-link">使用帮助</a>
+      </nav>
+    </header>
+    
+    <!-- 主内容 -->
+    <main class="main">
+      <!-- 顶部标签 -->
+      <div class="badge animate-fade-in">
+        🌟 AI驱动，科学记忆，轻松背单词
+      </div>
+      
+      <!-- 主标题区域 -->
+      <h1 class="hero-title animate-fade-in" data-text="Sofia背单词">Sofia背单词</h1>
+      <p class="hero-subtitle animate-fade-in">智能单词学习系统 v2.2.3</p>
+      <p class="hero-description animate-fade-in">
+        基于先进的记忆算法，为不同学习阶段提供个性化的单词学习体验。从小学到GRE，涵盖各类考试词汇，让背单词变得更加高效有趣。
+      </p>
+      
+      <!-- 主要操作按钮 -->
+      <a href="/vocab/signin" class="cta-button animate-fade-in">
+        🚀 开始学习
+      </a>
+      
+      <!-- 快速导航 -->
+      <div class="quick-nav animate-fade-in">
+        <!-- 前三个链接一行 -->
+        <div class="quick-nav-row">
+          <a href="/" class="quick-nav-item">
+            <span class="quick-nav-icon">🏢</span>
+            数智平台
+          </a>
+          <a href="http://fjzxedu.top:5002/learn/login" class="quick-nav-item">
+            <span class="quick-nav-icon">🎓</span>
+            智能学习
+          </a>
+          <a href="http://fjzxedu.top:5002/db_analytics/" class="quick-nav-item">
+            <span class="quick-nav-icon">📊</span>
+            学习报告
+          </a>
+        </div>
+        
+        <!-- 使用帮助单独一行 -->
+        <a href="/vocab/keepwords.html" class="quick-nav-item help-nav-item">
+          <span class="quick-nav-icon">📖</span>
+          使用帮助
+        </a>
+      </div>
+      
+      <!-- 特色功能 -->
+      <div class="features-grid animate-fade-in">
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3 class="feature-title">智能算法</h3>
+          <p class="feature-description">
+            采用艾宾浩斯遗忘曲线，根据记忆规律智能安排复习时间，提高学习效率。
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📚</div>
+          <h3 class="feature-title">丰富词库</h3>
+          <p class="feature-description">
+            涵盖小学到GRE各个阶段，包含高考、四六级、雅思托福等考试词汇。
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3 class="feature-title">学习统计</h3>
+          <p class="feature-description">
+            详细记录学习进度，可视化展示掌握情况，让学习成果一目了然。
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🚀</div>
+          <h3 class="feature-title">提升效率</h3>
+          <p class="feature-description">
+            通过科学的记忆方法和智能复习机制，可以有效将记忆单词的效率提升60%。
+          </p>
+        </div>
+      </div>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="footer">
+      <div class="footer-links">
+        <span class="footer-link">项目主页：GitHub</span>
+        <span class="footer-link">技术支持</span>
+        <span class="footer-link">用户反馈</span>
+      </div>
+      <p>© 2025. 枫中数智化研发小组. 沪ICP备2024093123号. 内部使用.</p>
+    </footer>
+  </div>
+  
+  <script>
+    // 确保页面在顶部加载
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+    
+    // 页面加载完成后确保在顶部
+    window.addEventListener('load', function() {
+      setTimeout(() => window.scrollTo(0, 0), 0);
+    });
+    
+    // DOM加载完成后也执行
+    document.addEventListener('DOMContentLoaded', function() {
+      window.scrollTo(0, 0);
+      
+      // 添加加载动画
+      const elements = document.querySelectorAll('.animate-fade-in');
+      elements.forEach((el, index) => {
+        el.style.animationDelay = `${index * 0.1}s`;
+      });
+    });
+    
+    // 页面显示时确保在顶部
+    window.addEventListener('pageshow', function(event) {
+      window.scrollTo(0, 0);
+    });
+  </script>
+</body>
+</html>

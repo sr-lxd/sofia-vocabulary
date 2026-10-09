@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="format-detection" content="telephone=no,email=no,address=no" />
+  <title>登录 - Sofia背单词v2.2.3@2025.9</title>
+  <link rel="icon" href="/custom-icon?icon=s2" />
+  
+  <style>
+    :root{
+      --primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --secondary: linear-gradient(135deg, #4CAF50, #45a049);
+      --bg: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+      --card: #fff;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --shadow: 0 25px 80px rgba(0,0,0,0.1);
+      --border: #e2e8f0;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html, body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    .container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      position: relative;
+    }
+    
+    /* 左上角返回按钮 */
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      padding: 10px 16px;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+    
+    .back-btn:hover {
+      background: #f8fafc;
+      border-color: #667eea;
+      color: #667eea;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .login-card {
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 50px;
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+    
+    .login-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin: 0 auto 30px auto;
+      box-shadow: 0 10px 30px rgba(102,126,234,0.3);
+    }
+    
+    .login-title {
+      font-size: 1.8rem;
+      color: var(--text-primary);
+      font-weight: 600;
+      margin-bottom: 30px;
+    }
+    
+    .form-section {
+      margin-bottom: 40px;
+    }
+    
+    .section-title {
+      font-size: 1.2rem;
+      color: var(--text-primary);
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    
+    .form-group {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    
+    .input {
+      padding: 16px 20px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background: white;
+      outline: none;
+    }
+    
+    .input:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+    }
+    
+    .btn {
+      padding: 16px 24px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+    }
+    
+    .btn-secondary {
+      background: var(--secondary);
+      color: white;
+      box-shadow: 0 4px 15px rgba(76,175,80,0.3);
+    }
+    
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76,175,80,0.4);
+    }
+    
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    
+    .form-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+    
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    
+    .checkbox {
+      width: 18px;
+      height: 18px;
+      accent-color: #667eea;
+    }
+    
+    .demo-hint {
+      color: var(--text-secondary);
+      background: #f3f4f6;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+    
+    .quick-login {
+      margin-top: 30px;
+    }
+    
+    .quick-login-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+      max-width: 100%;
+    }
+    
+    .quick-btn {
+      padding: 16px 12px;
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .quick-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    
+    .quick-hint {
+      text-align: center;
+      margin-top: 25px;
+      color: var(--text-secondary);
+      background: rgba(102,126,234,0.1);
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      border: 1px solid rgba(102,126,234,0.2);
+    }
+    
+    /* 移动端适配 */
+    @media (max-width: 768px) {
+      .container {
+        padding: 80px 12px 20px 12px; /* 增加顶部padding为返回按钮留出空间 */
+        min-height: 100vh;
+      }
+      
+      .back-btn {
+        top: 15px;
+        left: 15px;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+      }
+      
+      .login-card {
+        padding: 30px 20px;
+        max-width: 100%;
+        width: 100%;
+      }
+      
+      .input-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .button-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-footer {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+      
+      .quick-login-grid {
+        grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+        gap: 10px;
+      }
+      
+      .quick-btn {
+        padding: 14px 8px;
+        font-size: 13px;
+        word-break: keep-all;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .container {
+        padding: 70px 8px 15px 8px; /* 调整顶部padding */
+      }
+      
+      .back-btn {
+        top: 12px;
+        left: 12px;
+        padding: 6px 10px;
+        font-size: 0.85rem;
+      }
+      
+      .login-card {
+        padding: 25px 15px;
+        margin: 10px 0;
+      }
+      
+      .quick-login-grid {
+        grid-template-columns: repeat(auto-fit, minmax(75px, 1fr));
+        gap: 8px;
+      }
+      
+      .quick-btn {
+        padding: 12px 6px;
+        font-size: 11px;
+        word-break: keep-all;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .quick-hint {
+        font-size: 12px;
+        padding: 10px 15px;
+        margin-top: 15px;
+      }
+    }
+    
+    /* 超小屏幕优化 */
+    @media (max-width: 360px) {
+      .container {
+        padding: 60px 5px 10px 5px; /* 进一步调整padding */
+      }
+      
+      .back-btn {
+        top: 10px;
+        left: 10px;
+        padding: 5px 8px;
+        font-size: 0.8rem;
+      }
+      
+      .login-card {
+        padding: 20px 12px;
+        margin: 5px 0;
+      }
+      
+      .quick-login-grid {
+        grid-template-columns: repeat(auto-fit, minmax(65px, 1fr));
+        gap: 6px;
+      }
+      
+      .quick-btn {
+        padding: 10px 4px;
+        font-size: 10px;
+        min-height: 44px;
+        line-height: 1.2;
+      }
+    }
+    
+    /* 确保所有内容都在视口内 */
+    .quick-login, .login-card {
+      max-width: 100%;
+      overflow: hidden;
+    }
+    
+    /* Toast样式 */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 16px 20px;
+      border-radius: 12px;
+      color: white;
+      font-weight: 500;
+      z-index: 10000;
+      animation: slideIn 0.3s ease-out;
+      max-width: 300px;
+    }
+    
+    .toast.success {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+    
+    .toast.error {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(100px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 左上角返回按钮 -->
+    <a href="/vocab/main" class="back-btn">← 返回主页</a>
+    
+    
+    <!-- 登录卡片 -->
+    <div class="login-card">
+      <div class="login-icon">📚</div>
+      <h2 class="login-title">登录学习系统</h2>
+      
+      <!-- 个人账户登录 -->
+      <div class="form-section">
+        <h3 class="section-title">个人账户登录</h3>
+        <form id="login-form">
+          <div class="form-group">
+            <div class="input-row">
+              <input type="text" id="username" class="input" placeholder="用户名" required>
+              <input type="password" id="password" class="input" placeholder="密码" required>
+            </div>
+            <div class="button-row">
+              <button type="button" onclick="login()" class="btn btn-primary">
+                🚀 登录
+              </button>
+              <button type="button" onclick="register()" class="btn btn-secondary">
+                ✨ 注册
+              </button>
+            </div>
+          </div>
+          <div class="form-footer">
+            <label class="checkbox-label">
+              <input type="checkbox" id="remember-login" class="checkbox">
+              记住用户名
+            </label>
+            <div class="demo-hint">💡 可用 demo / demo 体验</div>
+          </div>
+        </form>
+      </div>
+      
+      <!-- 快速登录 -->
+      <div class="quick-login">
+        <h3 class="section-title">快速开始学习</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">选择词库，立即开始背单词</p>
+        
+        <div class="quick-login-grid">
+          <button onclick="quickLogin('xx')" class="quick-btn" style="background: linear-gradient(135deg, #10b981, #059669);">🎈 小学</button>
+          <button onclick="quickLogin('junior')" class="quick-btn" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">📚 初中</button>
+          <button onclick="quickLogin('gk')" class="quick-btn" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">🎓 高考</button>
+          <button onclick="quickLogin('dx4')" class="quick-btn" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">📘 四级</button>
+          <button onclick="quickLogin('dx6')" class="quick-btn" style="background: linear-gradient(135deg, #84cc16, #65a30d);">📗 六级</button>
+          <button onclick="quickLogin('zy4')" class="quick-btn" style="background: linear-gradient(135deg, #f97316, #ea580c);">📝 专四</button>
+          <button onclick="quickLogin('zy8')" class="quick-btn" style="background: linear-gradient(135deg, #ec4899, #db2777);">🎓 专八</button>
+          <button onclick="quickLogin('ys')" class="quick-btn" style="background: linear-gradient(135deg, #0ea5e9, #0284c7);">🇬🇧 雅思</button>
+          <button onclick="quickLogin('tofel')" class="quick-btn" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">🇺🇸 托福</button>
+          <button onclick="quickLogin('gre')" class="quick-btn" style="background: linear-gradient(135deg, #ef4444, #dc2626);">🎯 GRE</button>
+          <button onclick="quickLogin('zh')" class="quick-btn" style="background: linear-gradient(135deg, #dc2626, #b91c1c); box-shadow: 0 8px 20px rgba(220,38,38,0.3);">🏆 综合词库</button>
+          <button onclick="quickLogin('dict')" class="quick-btn" style="background: linear-gradient(135deg, #64748b, #475569);">📖 词典</button>
+        </div>
+        
+        <div class="quick-hint">
+          ⚡ 点击词库即可开始学习，无需输入密码
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "/vocab/api";
+    
+    let csrfToken = null;
+    
+    async function getCsrfToken() {
+      if (csrfToken) return csrfToken;
+      
+      try {
+        const response = await fetchWithTimeout(API_BASE + '/csrf_token', {
+          method: 'GET',
+          credentials: 'include'
+        }, 5000);
+        
+        const data = await response.json();
+        csrfToken = data.csrf_token;
+        return csrfToken;
+      } catch (err) {
+        return null;
+      }
+    }
+    
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+    
+    function safeLocalStorageSet(key, value) {
+      try {
+        if (typeof(Storage) !== "undefined") {
+          localStorage.setItem(key, value);
+          const readBack = localStorage.getItem(key);
+          if (readBack === value) {
+            return true;
+          }
+        }
+      } catch (e) {
+        return setCookieBackup(key, value);
+      }
+      return false;
+    }
+    
+    function safeLocalStorageGet(key) {
+      try {
+        if (typeof(Storage) !== "undefined") {
+          const value = localStorage.getItem(key);
+          if (value !== null) {
+            return value;
+          }
+        }
+      } catch (e) {
+        // 静默处理
+      }
+      return getCookieBackup(key);
+    }
+    
+    function safeLocalStorageRemove(key) {
+      try {
+        if (typeof(Storage) !== "undefined") {
+          localStorage.removeItem(key);
+          return true;
+        }
+      } catch (e) {
+        // 静默处理
+      }
+      removeCookieBackup(key);
+      return false;
+    }
+    
+    function setCookieBackup(key, value) {
+      try {
+        const expires = new Date();
+        expires.setTime(expires.getTime() + (365 * 24 * 60 * 60 * 1000));
+        
+        const cookieConfigs = [
+          `vocab_${key}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/;SameSite=Lax`,
+          `vocab_${key}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/vocab/;SameSite=Lax`,
+          `vocab_${key}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/vocab/signin;SameSite=Lax`,
+          `vocab_persist_${key}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/;SameSite=Lax;Secure=false`
+        ];
+        
+        cookieConfigs.forEach(config => {
+          document.cookie = config;
+        });
+        
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+    
+    function getCookieBackup(key) {
+      try {
+        const cookiePatterns = [`vocab_${key}=`, `vocab_persist_${key}=`];
+        
+        for (const nameEQ of cookiePatterns) {
+          const ca = document.cookie.split(';');
+          for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) {
+              const value = decodeURIComponent(c.substring(nameEQ.length, c.length));
+              return value;
+            }
+          }
+        }
+        
+        return null;
+      } catch (e) {
+        return null;
+      }
+    }
+    
+    function removeCookieBackup(key) {
+      try {
+        const cookiePatterns = [`vocab_${key}`, `vocab_persist_${key}`];
+        const paths = ['/', '/vocab/', '/vocab/signin'];
+        
+        cookiePatterns.forEach(cookieName => {
+          paths.forEach(path => {
+            document.cookie = `${cookieName}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=${path}`;
+          });
+        });
+      } catch (e) {
+        // 静默处理
+      }
+    }
+    
+    function isMobileDevice() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    
+    function isPrivateMode() {
+      return new Promise((resolve) => {
+        try {
+          const testKey = '_test_private_mode';
+          localStorage.setItem(testKey, 'test');
+          localStorage.removeItem(testKey);
+          resolve(false);
+        } catch (e) {
+          resolve(true);
+        }
+      });
+    }
+    
+    function multiLevelGet(key) {
+      let value = null;
+      
+      value = safeLocalStorageGet(key);
+      if (value) {
+        return value;
+      }
+      
+      try {
+        value = localStorage.getItem(`vocab_${key}`);
+        if (value) {
+          safeLocalStorageSet(key, value);
+          return value;
+        }
+      } catch (e) {
+        // 静默处理
+      }
+      
+      try {
+        value = sessionStorage.getItem(`vocab_${key}`);
+        if (value) {
+          safeLocalStorageSet(key, value);
+          return value;
+        }
+      } catch (e) {
+        // 静默处理
+      }
+      
+      value = getCookieBackup(key);
+      if (value) {
+        safeLocalStorageSet(key, value);
+        return value;
+      }
+      
+      try {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+          cookie = cookie.trim();
+          if (cookie.includes(key) && cookie.includes('=')) {
+            const [cookieName, cookieValue] = cookie.split('=');
+            if (cookieName.includes(key) && cookieValue) {
+              value = decodeURIComponent(cookieValue);
+              safeLocalStorageSet(key, value);
+              setCookieBackup(key, value);
+              return value;
+            }
+          }
+        }
+      } catch (e) {
+        // 静默处理
+      }
+      
+      return null;
+    }
+    
+    function multiLevelSet(key, value) {
+      let success = false;
+      
+      if (safeLocalStorageSet(key, value)) {
+        success = true;
+      }
+      
+      try {
+        sessionStorage.setItem(`vocab_${key}`, value);
+      } catch (e) {
+        // 静默处理
+      }
+      
+      if (setCookieBackup(key, value)) {
+        success = true;
+      }
+      
+      return success;
+    }
+    
+    function multiLevelRemove(key) {
+      safeLocalStorageRemove(key);
+      
+      try {
+        sessionStorage.removeItem(`vocab_${key}`);
+      } catch (e) {
+        // 静默处理
+      }
+      
+      removeCookieBackup(key);
+    }
+    
+    async function getServerRememberedLogin() {
+      try {
+        const response = await fetch('/vocab/api/get_remembered_login', {
+          method: 'GET',
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.ok && data.has_data) {
+            return {
+              username: data.username,
+              password: data.password,
+              hasData: true,
+              deviceFingerprint: data.device_fingerprint
+            };
+          } else {
+            return {
+              hasData: false,
+              deviceFingerprint: data.device_fingerprint
+            };
+          }
+        }
+      } catch (error) {
+        // 静默处理
+      }
+      return { hasData: false };
+    }
+    
+    async function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      if (!username || !password) { showToast('请输入用户名和密码', 'error'); return; }
+      const button = document.querySelector('button[onclick="login()"]');
+      const label = button.textContent;
+      button.disabled = true;
+      button.textContent = '🔄 登录中...';
+      try {
+        const response = await fetch(API_BASE + '/login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+          body: JSON.stringify({ username, password })
+        });
+        if (response.ok) {
+          multiLevelRemove('remembered_password');
+          if (document.getElementById('remember-login').checked) {
+            multiLevelSet('remembered_username', username);
+            multiLevelSet('remember_login', 'true');
+          } else {
+            multiLevelRemove('remembered_username');
+            multiLevelRemove('remember_login');
+          }
+          showToast('登录成功！');
+          setTimeout(() => { window.location.href = '/vocab/app'; }, 1000);
+        } else {
+          const error = await response.json();
+          showToast('登录失败：' + (error.message || '请检查用户名和密码'), 'error');
+        }
+      } catch (error) {
+        showToast('登录失败：网络连接异常', 'error');
+      } finally {
+        button.disabled = false;
+        button.textContent = label;
+      }
+    }
+
+    async function register() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      if (!username || !password) { showToast('请输入用户名和密码', 'error'); return; }
+      const button = document.querySelector('button[onclick="register()"]');
+      const label = button.textContent;
+      button.disabled = true;
+      button.textContent = '🔄 注册中...';
+      try {
+        const response = await fetch(API_BASE + '/register', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+          body: JSON.stringify({ username, password })
+        });
+        if (response.ok) {
+          multiLevelRemove('remembered_password');
+          if (document.getElementById('remember-login').checked) {
+            multiLevelSet('remembered_username', username);
+            multiLevelSet('remember_login', 'true');
+          } else {
+            multiLevelRemove('remembered_username');
+            multiLevelRemove('remember_login');
+          }
+          showToast('注册成功！');
+          setTimeout(() => { window.location.href = '/vocab/app'; }, 1000);
+        } else {
+          const error = await response.json();
+          showToast('注册失败：' + (error.message || '用户名可能已存在'), 'error');
+        }
+      } catch (error) {
+        showToast('注册失败：网络连接异常', 'error');
+      } finally {
+        button.disabled = false;
+        button.textContent = label;
+      }
+    }
+    document.getElementById('login-form').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        login();
+      }
+    });
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // Remove credentials written by older versions; keep only the optional username.
+      multiLevelRemove('remembered_password');
+      const username = multiLevelGet('remembered_username');
+      const remembered = multiLevelGet('remember_login') === 'true';
+      if (remembered && username) {
+        document.getElementById('username').value = username;
+        document.getElementById('remember-login').checked = true;
+      }
+    });
+
+    function saveDataOnUnload() {
+      multiLevelRemove('remembered_password');
+      if (document.getElementById('remember-login').checked) {
+        const username = document.getElementById('username').value.trim();
+        if (username) {
+          multiLevelSet('remembered_username', username);
+          multiLevelSet('remember_login', 'true');
+        }
+      }
+    }
+
+    window.addEventListener('beforeunload', saveDataOnUnload);
+    window.addEventListener('pagehide', saveDataOnUnload);
+    window.addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'hidden') saveDataOnUnload();
+    });
+    // 移动端复选框触摸事件修复 - 增强版
+    let mobileHandlers = null;
+    
+    function setupMobileCheckboxFix() {
+      const checkbox = document.getElementById('remember-login');
+      const label = document.querySelector('.checkbox-label');
+      
+      if (!checkbox || !label) {
+        console.log('Checkbox or label not found, retrying...');
+        return false;
+      }
+      
+      // 清理之前的事件监听器
+      if (mobileHandlers) {
+        try {
+          label.removeEventListener('touchstart', mobileHandlers.labelTouch);
+          label.removeEventListener('click', mobileHandlers.labelClick);
+          label.removeEventListener('touchend', mobileHandlers.labelTouchEnd);
+          checkbox.removeEventListener('touchstart', mobileHandlers.checkboxTouch);
+          checkbox.removeEventListener('change', mobileHandlers.checkboxChange);
+        } catch (e) {
+          console.log('Error removing old handlers:', e);
+        }
+      }
+      
+      // 创建事件处理器
+      mobileHandlers = {
+        labelClick: function(e) {
+          console.log('Label clicked');
+          e.preventDefault();
+          e.stopPropagation();
+          checkbox.checked = !checkbox.checked;
+          checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+        },
+        
+        labelTouch: function(e) {
+          console.log('Label touched');
+          e.preventDefault();
+          e.stopPropagation();
+          this.style.opacity = '0.7';
+          
+          // 延时切换状态，避免与原生行为冲突
+          setTimeout(() => {
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+          }, 50);
+        },
+        
+        labelTouchEnd: function(e) {
+          console.log('Label touch ended');
+          setTimeout(() => {
+            this.style.opacity = '1';
+          }, 100);
+        },
+        
+        checkboxTouch: function(e) {
+          console.log('Checkbox touched');
+          e.stopPropagation();
+          // 让原生事件处理
+        },
+        
+        checkboxChange: function(e) {
+          console.log('Checkbox changed:', this.checked);
+        }
+      };
+      
+      // 添加事件监听器
+      try {
+        label.addEventListener('touchstart', mobileHandlers.labelTouch, { passive: false });
+        label.addEventListener('touchend', mobileHandlers.labelTouchEnd, { passive: false });
+        label.addEventListener('click', mobileHandlers.labelClick);
+        checkbox.addEventListener('touchstart', mobileHandlers.checkboxTouch, { passive: false });
+        checkbox.addEventListener('change', mobileHandlers.checkboxChange);
+        
+        // 移动端样式优化
+        if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+          label.style.webkitTouchCallout = 'none';
+          label.style.webkitUserSelect = 'none';
+          label.style.userSelect = 'none';
+          label.style.webkitTapHighlightColor = 'transparent';
+          
+          // 增加触摸区域
+          label.style.minHeight = '44px';
+          label.style.display = 'flex';
+          label.style.alignItems = 'center';
+          
+          // 复选框样式调整
+          checkbox.style.minWidth = '20px';
+          checkbox.style.minHeight = '20px';
+          checkbox.style.cursor = 'pointer';
+        }
+        
+        console.log('Mobile checkbox fix applied successfully');
+        return true;
+      } catch (e) {
+        console.error('Error setting up mobile checkbox fix:', e);
+        return false;
+      }
+    }
+    
+    // 页面加载完成后设置 - 增强版多次重试
+    document.addEventListener('DOMContentLoaded', function() {
+      let attempts = 0;
+      const maxAttempts = 10;
+      
+      function trySetupMobileCheckbox() {
+        attempts++;
+        console.log(`Attempting mobile checkbox setup, attempt ${attempts}`);
+        
+        if (setupMobileCheckboxFix()) {
+          console.log('Mobile checkbox setup successful');
+          return;
+        }
+        
+        if (attempts < maxAttempts) {
+          console.log(`Setup failed, retrying in ${attempts * 100}ms...`);
+          setTimeout(trySetupMobileCheckbox, attempts * 100);
+        } else {
+          console.error('Failed to setup mobile checkbox after', maxAttempts, 'attempts');
+        }
+      }
+      
+      // 立即尝试一次
+      trySetupMobileCheckbox();
+    });
+    
+    // 额外的兜底方案
+    window.addEventListener('load', function() {
+      setTimeout(() => {
+        if (!mobileHandlers) {
+          console.log('Fallback mobile checkbox setup');
+          setupMobileCheckboxFix();
+        }
+      }, 1000);
+    });
+    
+    // 页面显示时重新设置（处理从后台切回的情况）
+    document.addEventListener('visibilitychange', function() {
+      if (document.visibilityState === 'visible') {
+        setTimeout(() => {
+          setupMobileCheckboxFix();
+        }, 200);
+      }
+    });
+  </script>
+</body>
+</html>
+</html>
