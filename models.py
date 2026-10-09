@@ -46,7 +46,9 @@ class UserPref(db.Model):
     # 新词流锚点（允许长 en）
     last_en_marker = db.Column(db.Text)
     # 统计版本号（每次复习提交后 +1，用于乱序响应裁决）
-    stats_rev = db.Column(db.Integer, default=0, nullable=False)
+    stats_rev = db.Column(db.Integer, default=0, nullable=False)
+    study_pool = db.Column(db.String(8), default="easy", nullable=False)
+    deck_name = db.Column(db.String(255), default="未命名词库", nullable=False)
 
     updated_at = db.Column(db.DateTime, default=now_beijing, onupdate=now_beijing, nullable=False)
     created_at = db.Column(db.DateTime, default=now_beijing, nullable=False)
@@ -99,7 +101,10 @@ class ReviewState(db.Model):
     next_due = db.Column(db.DateTime, default=now_beijing, index=True)
 
     wrong_count = db.Column(db.Integer, default=0)
-    last_grade = db.Column(db.Integer)
+    last_grade = db.Column(db.Integer)
+    consec_easy = db.Column(db.Integer, default=0, nullable=False)
+    hard_streak = db.Column(db.Integer, default=0, nullable=False)
+    last_interval_hours = db.Column(db.Float)
     last_reviewed = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=now_beijing)
 

@@ -317,90 +317,45 @@ def api_events():
     return resp
 
 # ======================= 幂等：确保 userpref.study_pool / deck_name 列存在 =======================
-def _ensure_userpref_study_pool_column():
+def _ensure_columns(table_name: str, column_definitions: dict):
+    """Add missing columns on supported SQL databases using portable inspection."""
+    from sqlalchemy import inspect
+
+    inspector = inspect(db.engine)
+    if not inspector.has_table(table_name):
+        return
+    existing = {column["name"] for column in inspector.get_columns(table_name)}
     try:
-        row = db.session.execute(text("""
-            SELECT 1
-            FROM information_schema.COLUMNS
-            WHERE TABLE_SCHEMA = DATABASE()
-              AND TABLE_NAME = 'vocab_userpref'
-              AND COLUMN_NAME = 'study_pool'
-            LIMIT 1
-        """)).first()
-        if not row:
-            db.session.execute(text("""
-                ALTER TABLE vocab_userpref
-                  ADD COLUMN study_pool VARCHAR(8) NOT NULL DEFAULT 'easy' AFTER sort_mode
-            """))
-            db.session.commit()
+        with db.engine.begin() as connection:
+            for column_name, definition in column_definitions.items():
+                if column_name not in existing:
+                    connection.execute(text(
+                        f"ALTER TABLE {table_name} ADD COLUMN {column_name} {definition}"
+                    ))
     except Exception:
         db.session.rollback()
+        raise
+
+
+def _ensure_userpref_study_pool_column():
+    _ensure_columns("vocab_userpref", {"study_pool": "VARCHAR(8) NOT NULL DEFAULT 'easy'"})
+
 
 def _ensure_userpref_deck_name_column():
-    try:
-        row = db.session.execute(text("""
-            SELECT 1
-            FROM information_schema.COLUMNS
-            WHERE TABLE_SCHEMA = DATABASE()
-              AND TABLE_NAME = 'vocab_userpref'
-              AND COLUMN_NAME = 'deck_name'
-            LIMIT 1
-        """)).first()
-        if not row:
-            db.session.execute(text("""
-                ALTER TABLE vocab_userpref
-                  ADD COLUMN deck_name VARCHAR(255) NOT NULL DEFAULT '未命名词库' AFTER study_pool
-            """))
-            db.session.commit()
-        db.session.execute(text("""
-            UPDATE vocab_userpref SET deck_name = COALESCE(deck_name, '未命名词库')
-        """))
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
+    _ensure_columns("vocab_userpref", {"deck_name": "VARCHAR(255) NOT NULL DEFAULT '未命名词库'"})
+
 
 def _ensure_userpref(uid: int) -> UserPref:
-    """确保用户偏好记录存在，给默认值（优化版：防止死锁）"""
-    from sqlalchemy.exc import OperationalError
-    import time
-    
-    _ensure_userpref_study_pool_column()
-    _ensure_userpref_deck_name_column()
-    
-    max_retries = 3
-    for attempt in range(max_retries):
-        try:
-            # 使用单个 INSERT ON DUPLICATE KEY UPDATE 语句避免死锁
-            db.session.execute(text("""
-                INSERT INTO vocab_userpref 
-                (user_id, sort_mode, last_en_marker, stats_rev, study_pool, deck_name)
-                VALUES (:uid, 'asc', NULL, 0, 'easy', '未命名词库')
-                ON DUPLICATE KEY UPDATE
-                    study_pool = COALESCE(study_pool, 'easy'),
-                    deck_name = COALESCE(deck_name, '未命名词库'),
-                    updated_at = NOW()
-            """), {"uid": uid})
-            db.session.commit()
-            break
-            
-        except OperationalError as e:
-            db.session.rollback()
-            if 'Deadlock' in str(e) and attempt < max_retries - 1:
-                # 指数退避重试
-                sleep_time = 0.1 * (2 ** attempt)
-                logging.warning(f"检测到死锁，{sleep_time:.1f}秒后重试 (attempt {attempt + 1}/{max_retries}): {e}")
-                time.sleep(sleep_time)
-                continue
-            else:
-                logging.error(f"数据库操作失败，已达最大重试次数: {e}")
-                raise
-        except Exception as e:
-            db.session.rollback()
-            logging.error(f"_ensure_userpref 发生未知错误: {e}")
-            raise
-    
-    return UserPref.query.filter_by(user_id=uid).first()
-
+    """Return the user's preference row, creating it with model defaults."""
+    pref = UserPref.query.filter_by(user_id=uid).first()
+    if pref is None:
+        pref = UserPref(user_id=uid)
+        db.session.add(pref)
+    else:
+        pref.study_pool = pref.study_pool or "easy"
+        pref.deck_name = pref.deck_name or "未命名词库"
+    db.session.commit()
+    return pref
 def _get_or_create_pref(uid: int) -> UserPref:
     return _ensure_userpref(uid)
 
@@ -1627,35 +1582,12 @@ def api_next_cards():
 
 # ======================= 打分（含：提前补偿 + 到期聚合） =======================
 def _ensure_reviewstate_srs_columns():
-    """
-    为 ReviewState 表按需补充：
-    - consec_easy INT      连续 easy 次数
-    - hard_streak INT      连续 hard/again 次数
-    - last_interval_hours DOUBLE NULL AFTER next_due
-    """
-    try:
-        table_name = ReviewState.__table__.name
-        def col_exists(col):
-            row = db.session.execute(text("""
-                SELECT 1
-                FROM information_schema.COLUMNS
-                WHERE TABLE_SCHEMA = DATABASE()
-                  AND TABLE_NAME = :t
-                  AND COLUMN_NAME = :c
-                LIMIT 1
-            """), {"t": table_name, "c": col}).first()
-            return bool(row)
-
-        if not col_exists("consec_easy"):
-            db.session.execute(text(f"ALTER TABLE {table_name} ADD COLUMN consec_easy INT NOT NULL DEFAULT 0 AFTER wrong_count"))
-        if not col_exists("hard_streak"):
-            db.session.execute(text(f"ALTER TABLE {table_name} ADD COLUMN hard_streak INT NOT NULL DEFAULT 0 AFTER consec_easy"))
-        if not col_exists("last_interval_hours"):
-            db.session.execute(text(f"ALTER TABLE {table_name} ADD COLUMN last_interval_hours DOUBLE NULL AFTER next_due"))
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-
+    """Add the additional SM-2 review fields when using an older local database."""
+    _ensure_columns("vocab_reviewstate", {
+        "consec_easy": "INTEGER NOT NULL DEFAULT 0",
+        "hard_streak": "INTEGER NOT NULL DEFAULT 0",
+        "last_interval_hours": "FLOAT NULL",
+    })
 @vocab_bp.post("/api/defer")
 @login_required
 def api_defer():

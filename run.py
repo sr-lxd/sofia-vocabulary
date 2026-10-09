@@ -58,6 +58,14 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+        from vocab_pro.routes import (
+            _ensure_userpref_study_pool_column,
+            _ensure_userpref_deck_name_column,
+            _ensure_reviewstate_srs_columns,
+        )
+        _ensure_userpref_study_pool_column()
+        _ensure_userpref_deck_name_column()
+        _ensure_reviewstate_srs_columns()
 
     return app
 
