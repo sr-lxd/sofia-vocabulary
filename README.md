@@ -32,7 +32,7 @@ python -m pip install -r requirements.txt
 python vocab_app.py
 ```
 
-浏览器打开：<http://127.0.0.1:5000/vocab/>。
+浏览器打开：<http://127.0.0.1:5050/vocab/>。
 
 如果 PowerShell 阻止虚拟环境激活，可直接使用虚拟环境里的 Python 安装依赖并启动：
 
@@ -44,11 +44,11 @@ python vocab_app.py
 停止服务时，在启动窗口按 `Ctrl+C`。可通过 `VOCAB_PORT` 环境变量更换本机端口，例如：
 
 ```powershell
-$env:VOCAB_PORT = "5050"
+$env:VOCAB_PORT = "5051"
 python vocab_app.py
 ```
 
-访问地址相应变成 `http://127.0.0.1:5050/vocab/`。服务器绑定 `127.0.0.1`，局域网其他设备无法直接访问。
+访问地址相应变成 `http://127.0.0.1:5051/vocab/`。服务器绑定 `127.0.0.1`，局域网其他设备无法直接访问。
 
 ## 首次使用
 
@@ -92,7 +92,7 @@ vocab_pro/
 ## 配置说明
 
 - `FLASK_SECRET_KEY`：Flask 会话签名密钥。应设置为随机长字符串。
-- `VOCAB_PORT`：本机监听端口，默认 `5000`。
+- `VOCAB_PORT`：本机监听端口，默认 `5050`。
 - 数据库：默认使用项目目录中的 SQLite 文件 `vocab.db`。
 
 ## 隐私与使用范围
