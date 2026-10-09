@@ -71,7 +71,6 @@ class DeckWord(db.Model):
 
     __table_args__ = (
         UniqueConstraint("user_id", "en", name="uq_vocab_user_en"),
-        Index("ix_vocab_deckword_user_id", "user_id"),
         Index("ix_vocab_deckword_en", "en"),
     )
 
