@@ -4,6 +4,8 @@
 **Sofia Vocabulary** — a personal English vocabulary trainer (Flask + SQLite) with SM-2 spaced repetition, built-in word lists and learning statistics.
 <!-- /en-intro -->
 
+![界面截图](docs/screenshot-1.png)
+
 ---
 
 一个基于 Flask、SQLite 和浏览器界面的个人英语词汇学习项目。项目提供账号注册与登录、个人词库维护、单词复习、学习统计和错词导入导出等功能。默认只监听本机 `127.0.0.1`，适合在自己的 Windows 电脑上运行。
